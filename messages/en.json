@@ -1,0 +1,21 @@
+{
+    "title": "Hello world!",
+    "en": "English",
+    "he": "Hebrew",
+    "language": "Language",
+    "reichman_university_entrepreneurship_hub": "Reichman University Entrepreneurship Hub",
+    "software_developers": "Software Developers",
+    "product_managers": "Product Managers",
+    "ui_ux_designers": "UI/UX Designers",
+    "marketing_specialists": "Marketing Specialists",
+    "business_development_manager": "Business Development Manager",
+    "connect_with": "Connect With",
+    "join": "Join",
+    "login": "Login",
+    "enter_your_email_below": "Enter your email below to login to your account",
+    "email": "Email",
+    "password": "Password",
+    "forgot_your_password": "Forgot Your Password?",
+    "dont_have_an_account": "Don't have an account?",
+    "sign_up": "Sign up"
+}

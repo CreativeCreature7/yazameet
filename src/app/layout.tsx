@@ -2,14 +2,15 @@ import "@/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
-import { Raleway as FontSans } from "next/font/google";
+import { Arimo as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
-
 import { TRPCReactProvider } from "@/trpc/react";
-
 import { ThemeProvider } from "@/components/theme-provider";
-
 import { Toaster } from "@/components/ui/sonner";
+import { Header } from "@/components/header";
+
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -18,15 +19,22 @@ export const metadata: Metadata = {
 };
 
 const fontSans = FontSans({
-  subsets: ["latin"],
+  subsets: ["latin", "hebrew"],
   variable: "--font-sans",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html
+      lang={locale}
+      dir={locale === "he" ? "rtl" : "ltr"}
+      className={`${GeistSans.variable}`}
+    >
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
@@ -34,14 +42,17 @@ export default function RootLayout({
         )}
       >
         <TRPCReactProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
+          <NextIntlClientProvider messages={messages}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              disableTransitionOnChange
+            >
+              <Header />
+              {children}
+              <Toaster />
+            </ThemeProvider>
+          </NextIntlClientProvider>
         </TRPCReactProvider>
       </body>
     </html>
