@@ -1,8 +1,8 @@
-import { ThemeToggle } from "@/components/theme-toggle";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { Button } from "@/components/ui/button";
 import { FlipWords } from "@/components/ui/flip-words";
-import { ArrowLeft, ArrowRight, CirclePlay } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default async function Home() {
   const words = [
@@ -73,15 +73,17 @@ export default async function Home() {
           </div>
         </div>
       </div>
-      <Button
-        className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"
-        variant="expandIcon"
-        iconPlacement="right"
-        Icon={ArrowRight}
-        size="lg"
-      >
-        Join
-      </Button>
+      <Link href={"/auth/sign-in"}>
+        <Button
+          className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"
+          variant="expandIcon"
+          iconPlacement="right"
+          Icon={ArrowRight}
+          size="lg"
+        >
+          Join
+        </Button>
+      </Link>
     </main>
   );
 }
