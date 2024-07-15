@@ -104,7 +104,7 @@ export default function SignUp() {
   ];
 
   return (
-    <Card className="fixed left-1/2 top-1/2 mx-auto max-w-md -translate-x-1/2 -translate-y-1/2">
+    <Card className="fixed left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 md:mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl">Sign Up</CardTitle>
         <CardDescription>
@@ -116,11 +116,11 @@ export default function SignUp() {
           <div className="grid grid-cols-3 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="first-name">First name</Label>
-              <Input id="first-name" placeholder="Max" required />
+              <Input id="first-name" placeholder="Tyler" required />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="last-name">Last name</Label>
-              <Input id="last-name" placeholder="Robinson" required />
+              <Input id="last-name" placeholder="Durden" required />
             </div>
             <div className="grid gap-2">
               <Label>Year</Label>
@@ -150,8 +150,9 @@ export default function SignUp() {
             />
           </div>
           <div className="grid gap-2">
-            <Label>What are your roles?</Label>
             <div className="w-full">
+              <Label>What are your roles?</Label>
+
               <MultiSelect
                 defaultOptions={OPTIONS}
                 placeholder="Select your Role/s"

@@ -10,20 +10,22 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from "next-intl";
+import { Icons } from "@/components/Icons";
 
 export default function Login() {
+  const t = useTranslations();
+
   return (
     <Card className="fixed left-1/2 top-1/2 mx-auto max-w-sm -translate-x-1/2 -translate-y-1/2">
       <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
-        <CardDescription>
-          Enter your email below to login to your account
-        </CardDescription>
+        <CardTitle className="text-2xl">{t("login")}</CardTitle>
+        <CardDescription>{t("enter_your_email_below")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               type="email"
@@ -33,24 +35,38 @@ export default function Login() {
           </div>
           <div className="grid gap-2">
             <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              <Link href="/auth/forgot-password" className="ml-auto inline-block text-sm underline">
-                Forgot your password?
+              <Label htmlFor="password">{t("password")}</Label>
+              <Link
+                href="/auth/forgot-password"
+                className="ms-auto inline-block text-sm underline"
+              >
+                {t("forgot_your_password")}
               </Link>
             </div>
             <Input id="password" type="password" required />
           </div>
           <Button type="submit" className="w-full">
-            Login
+            {t("login")}
           </Button>
-          <Button variant="outline" className="w-full">
-            Login with Google
-          </Button>
+          <div className="flex flex-row gap-3">
+            <Button
+              variant="outline"
+              className="inline-flex w-full items-center justify-center"
+            >
+              <Icons.google className="h-5" />
+            </Button>
+            <Button
+              variant="outline"
+              className="inline-flex w-full items-center justify-center"
+            >
+              <Icons.discord className="h-5" />
+            </Button>
+          </div>
         </div>
         <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
+          {t("dont_have_an_account")}{" "}
           <Link href="/auth/sign-up" className="underline">
-            Sign up
+            {t("sign_up")}
           </Link>
         </div>
       </CardContent>

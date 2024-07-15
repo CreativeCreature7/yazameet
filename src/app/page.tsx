@@ -1,16 +1,20 @@
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { Button } from "@/components/ui/button";
 import { FlipWords } from "@/components/ui/flip-words";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { getTranslations, getLocale } from "next-intl/server";
 
 export default async function Home() {
+  const t = await getTranslations();
+  const locale = await getLocale();
+
   const words = [
-    "Software Developers",
-    "Product Managers",
-    "UI/UX Designers",
-    "Marketing Specialists",
-    "Business Development Manager",
+    t("software_developers"),
+    t("product_managers"),
+    t("ui_ux_designers"),
+    t("marketing_specialists"),
+    t("business_development_manager"),
   ];
   const people = [
     {
@@ -62,10 +66,10 @@ export default async function Home() {
       <div className="flex min-h-screen flex-col items-center justify-center">
         <div className="mx-auto text-4xl font-normal">
           <h1 className="mb-6 max-w-[800px] text-[64px] leading-[60px] -tracking-wider">
-            Reichman Universtay Enterprensuhip Hub
+            {t("reichman_university_entrepreneurship_hub")}
           </h1>
           <span className="text-neutral-600 dark:text-neutral-400">
-            Connect with
+            {t("connect_with")}
           </span>
           <FlipWords words={words} /> <br />
           <div className="mt-2 flex flex-row items-start justify-start">
@@ -78,10 +82,10 @@ export default async function Home() {
           className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"
           variant="expandIcon"
           iconPlacement="right"
-          Icon={ArrowRight}
+          Icon={locale === "he" ? ArrowLeft : ArrowRight}
           size="lg"
         >
-          Join
+          {t("join")}
         </Button>
       </Link>
     </main>
