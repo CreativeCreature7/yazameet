@@ -8,14 +8,12 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ClientSafeProvider, LiteralUnion, signIn } from "next-auth/react";
@@ -59,7 +57,7 @@ export function LoginForm({ providers }: Props) {
 
   return (
     <>
-      <Form {...form}>
+      {/* <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
@@ -105,7 +103,7 @@ export function LoginForm({ providers }: Props) {
             {t("login")}
           </Button>
         </form>
-      </Form>
+      </Form> */}
       <div className="mt-4 flex flex-row gap-3">
         {Object.values(providers!).map((provider) => (
           <Button
@@ -122,12 +120,12 @@ export function LoginForm({ providers }: Props) {
           </Button>
         ))}
       </div>
-      <div className="mt-4 text-center text-sm">
+      {/* <div className="mt-4 text-center text-sm">
         {t("dont_have_an_account")}{" "}
         <Link href="/auth/sign-up" className="underline">
           {t("sign_up")}
         </Link>
-      </div>
+      </div> */}
     </>
   );
 }

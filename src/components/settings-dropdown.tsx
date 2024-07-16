@@ -13,13 +13,18 @@ import {
 import { useTranslations, useLocale } from "next-intl";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function SettingsDropdown() {
   const t = useTranslations();
+  const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/", redirect: true });
-    setTimeout(() => toast.success(t("signed_out_success")), 1000);
+    void (await signOut({ redirect: false }));
+    toast.success(t("signed_out_success"));
+    setTimeout(() => {
+      router.replace("/");
+    }, 1500);
   };
 
   return (

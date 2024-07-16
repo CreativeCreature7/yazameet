@@ -28,8 +28,11 @@ import {
 } from "@/components/ui/file-upload";
 import { Paperclip } from "lucide-react";
 import MultiSelect, { Option } from "@/components/ui/multi-select";
+import { useTranslations } from "next-intl";
+import { Roles } from "@prisma/client";
 
 const FileSvgDraw = () => {
+  const t = useTranslations();
   return (
     <>
       <svg
@@ -48,11 +51,11 @@ const FileSvgDraw = () => {
         />
       </svg>
       <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-        <span className="font-semibold">Click to upload</span>
-        &nbsp; or drag and drop
+        <span className="font-semibold">{t("click_to_upload")}</span>{" "}
+        {t("or_drag_and_drop")}
       </p>
       <p className="text-xs text-gray-500 dark:text-gray-400">
-        SVG, PNG, JPG or GIF
+        {t("png_jpg_or_gif")}
       </p>
     </>
   );
@@ -74,7 +77,7 @@ const FileUploaderTest = () => {
       dropzoneOptions={dropZoneConfig}
       className="relative rounded-lg bg-background p-2"
     >
-      <FileInput className="outline-dashed outline-1 outline-white">
+      <FileInput className="outline-dashed outline-1 outline-black dark:outline-white">
         <div className="flex w-full flex-col items-center justify-center pb-4 pt-3">
           <FileSvgDraw />
         </div>
@@ -94,92 +97,61 @@ const FileUploaderTest = () => {
 };
 
 export default function SignUp() {
-  const [value, setValue] = useState<string[]>([]);
+  const t = useTranslations();
 
-  const OPTIONS: Option[] = [
-    { label: "Product Manager", value: "Product Manager" },
-    { label: "Marketing Specialist", value: "Marketing Specialist" },
-    { label: "UI/UX Designer", value: "UI/UX Designer" },
-    { label: "Business", value: "Business" },
-  ];
+  const OPTIONS: Option[] = Object.values(Roles).map((value) => ({
+    label: t(value),
+    value,
+  }));
 
   return (
     <Card className="fixed left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 md:mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">Sign Up</CardTitle>
-        <CardDescription>
-          Enter your information to create an account
-        </CardDescription>
+        <CardTitle className="text-2xl">{t("profile_details")}</CardTitle>
+        <CardDescription>{t("in_order_to_continue")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="first-name">First name</Label>
-              <Input id="first-name" placeholder="Tyler" required />
+              <Label htmlFor="full-name">{t("full_name")}</Label>
+              <Input id="full-name" placeholder={t("tyler_durden")} required />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="last-name">Last name</Label>
-              <Input id="last-name" placeholder="Durden" required />
-            </div>
-            <div className="grid gap-2">
-              <Label>Year</Label>
+              <Label>{t("year")}</Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Year" />
+                  <SelectValue placeholder={t("select_year")} />
                 </SelectTrigger>
                 <SelectContent className="w-[180px]">
-                  <SelectItem value="1">1st Year</SelectItem>
-                  <SelectItem value="2">2nd Year</SelectItem>
-                  <SelectItem value="3">3rd Year</SelectItem>
+                  <SelectItem value="1">{t("year_1")}</SelectItem>
+                  <SelectItem value="2">{t("year_2")}</SelectItem>
+                  <SelectItem value="3">{t("year_3")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="grid gap-2">
-            <Label>Profile Picture</Label>
+            <Label>{t("profile_picture")}</Label>
             <FileUploaderTest />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-            />
-          </div>
-          <div className="grid gap-2">
             <div className="w-full">
-              <Label>What are your roles?</Label>
-
+              <Label>{t("what_are_your_roles")}</Label>
               <MultiSelect
                 defaultOptions={OPTIONS}
-                placeholder="Select your Role/s"
+                placeholder={t("select_your_roles")}
                 emptyIndicator={
                   <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                    no results found.
+                    {t("no_results")}
                   </p>
                 }
               />
             </div>
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" />
-          </div>
           <Button type="submit" className="w-full">
-            Create an account
+            {t("join")}
           </Button>
-          <Button variant="outline" className="w-full">
-            Sign up with GitHub
-          </Button>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link href="/auth/sign-in" className="underline">
-            Sign in
-          </Link>
         </div>
       </CardContent>
     </Card>

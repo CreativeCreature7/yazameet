@@ -88,13 +88,13 @@ const Button = React.forwardRef<
         {...props}
       >
         {Icon && iconPlacement === "left" && (
-          <div className="group-hover:translate-x-100 me-2 w-0 translate-x-[0%] ps-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:ps-2 group-hover:opacity-100 rtl:rotate-180">
+          <div className="group-hover:translate-x-100 w-0 translate-x-[0%] pr-0 opacity-0 transition-all duration-200 group-hover:me-2 group-hover:w-5 group-hover:pe-2 group-hover:opacity-100 rtl:rotate-180">
             <Icon />
           </div>
         )}
         <Slottable>{props.children}</Slottable>
         {Icon && iconPlacement === "right" && (
-          <div className="ms-2 w-0 translate-x-[100%] pe-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:translate-x-0 group-hover:pe-2 group-hover:opacity-100 rtl:rotate-180">
+          <div className="w-0 translate-x-[100%] pe-0 opacity-0 transition-all duration-200 group-hover:w-5 group-hover:translate-x-0 group-hover:opacity-100 group-hover:ltr:ps-2 rtl:rotate-180 group-hover:rtl:ms-2">
             <Icon />
           </div>
         )}

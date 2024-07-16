@@ -16,9 +16,9 @@ export function Header() {
   return (
     <div className="fixed top-0 grid w-full grid-cols-12">
       <div className="col-span-3 ms-10 flex flex-row items-center gap-2">
-        <LanguageSwitcher />
-        <ThemeToggle />
         {status === "authenticated" && <SettingsDropdown />}
+        <ThemeToggle />
+        <LanguageSwitcher />
       </div>
       <Link className="col-start-5 col-end-9" href={"/"}>
         <Image

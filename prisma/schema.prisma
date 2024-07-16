@@ -72,7 +72,6 @@ model VerificationToken {
 
 enum Roles {
     DESIGNER
-    PRODUCT
     PROJECTMANAGER
     DATAANALYST
     SUSTAINABILITYSPECIALIST

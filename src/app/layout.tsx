@@ -51,12 +51,12 @@ export default async function RootLayout({
                 <ClientDirectionProvider dir={dir}>
                   <Header />
                   {children}
-                  <Toaster />
                 </ClientDirectionProvider>
               </ClientSessionProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
         </TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );

@@ -30,8 +30,8 @@ export default async function Login() {
   return (
     <Card className="fixed left-1/2 top-1/2 mx-auto max-w-sm -translate-x-1/2 -translate-y-1/2">
       <CardHeader>
-        <CardTitle className="text-2xl">{t("login")}</CardTitle>
-        <CardDescription>{t("enter_your_email_below")}</CardDescription>
+        <CardTitle className="text-center text-2xl">{t("login")}</CardTitle>
+        {/* <CardDescription>{t("enter_your_email_below")}</CardDescription> */}
       </CardHeader>
       <CardContent>
         <LoginForm providers={providers} />
