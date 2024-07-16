@@ -57,6 +57,8 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
+    roles         Roles[]
+    year          Year?
     accounts      Account[]
     sessions      Session[]
     posts         Project[]
@@ -82,4 +84,10 @@ enum Roles {
     PUBLICRELATIONSSPECIALIST
     PSYCHOLOGISTHRSPECIALIST
     LEGALCOMPLIANCEOFFICER
+}
+
+enum Year {
+    FIRST
+    SECOND
+    THIRD
 }
