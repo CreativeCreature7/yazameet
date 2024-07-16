@@ -18,12 +18,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { AutosizeTextarea } from "@/components/ui/autosize-textarea";
 import { optionRolesSchema } from "@/lib/schemas";
+import { LoadingButton } from "@/components/ui/loading-button";
 
 const BaseSchema = (t: (arg: string) => string) =>
   z.object({
     name: z.string().min(1),
     description: z.string().min(1),
-    rolesNeeded: z.array(optionRolesSchema),
+    rolesNeeded: z.array(optionRolesSchema).min(1),
   });
 
 export function LatestProject() {
@@ -62,14 +63,7 @@ export function LatestProject() {
   }
 
   return (
-    <div className="w-full max-w-xs">
-      {LatestProject ? (
-        <p className="truncate">
-          Your most recent project: {LatestProject.name}
-        </p>
-      ) : (
-        <p>You have no posts yet.</p>
-      )}
+    <div className="w-full">
       <FormProvider {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -81,7 +75,7 @@ export function LatestProject() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("name")}</FormLabel>
+                  <FormLabel>{t("project_name")}</FormLabel>
                   <FormControl>
                     <Input placeholder={t("project_name")} {...field} />
                   </FormControl>
@@ -113,7 +107,7 @@ export function LatestProject() {
             name="rolesNeeded"
             render={({ field }) => (
               <FormItem className="block w-full">
-                <FormLabel>{t("what_are_your_roles")}</FormLabel>
+                <FormLabel>{t("what_roles_do_you_need")}</FormLabel>
                 <FormControl>
                   <MultiSelect
                     {...field}
@@ -130,9 +124,13 @@ export function LatestProject() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            {t("join")}
-          </Button>
+          <LoadingButton
+            type="submit"
+            className="w-full"
+            loading={createProject.isPending}
+          >
+            {t("add")}
+          </LoadingButton>
         </form>
       </FormProvider>
     </div>

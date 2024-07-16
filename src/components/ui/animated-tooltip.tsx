@@ -8,17 +8,35 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
+import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-export const AnimatedTooltip = ({
-  items,
-}: {
+const tooltipVariants = cva(
+  "relative !m-0 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105",
+  {
+    variants: {
+      size: {
+        sm: "h-12 w-12",
+        default: "h-14 w-14",
+      },
+    },
+    defaultVariants: {
+      size: "default",
+    },
+  },
+);
+
+type Props = {
   items: {
     id: number;
     name: string;
     designation: string;
     image: string;
   }[];
-}) => {
+  size?: "default" | "sm";
+};
+
+export const AnimatedTooltip = ({ items, size }: Props) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const springConfig = { stiffness: 100, damping: 5 };
   const x = useMotionValue(0); // going to set this value on mouse move
@@ -83,7 +101,7 @@ export const AnimatedTooltip = ({
             width={100}
             src={item.image}
             alt={item.name}
-            className="relative !m-0 h-14 w-14 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105"
+            className={cn(tooltipVariants({ size }))}
           />
         </div>
       ))}

@@ -54,5 +54,10 @@
     "PRODUCTMANAGER": "Product Manager",
     "PUBLICRELATIONSSPECIALIST": "Public Relations Specialist",
     "PSYCHOLOGISTHRSPECIALIST": "Psychologist/HR Specialist",
-    "LEGALCOMPLIANCEOFFICER": "Legal Compliance Officer"
+    "LEGALCOMPLIANCEOFFICER": "Legal Compliance Officer",
+    "project_name": "Project Name",
+    "project_description": "Project Description",
+    "description": "Description",
+    "what_roles_do_you_need": "What role/s are needed for the project?",
+    "add": "Add"
 }

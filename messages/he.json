@@ -54,5 +54,10 @@
     "PRODUCTMANAGER": "מנהל מוצר",
     "PUBLICRELATIONSSPECIALIST": "מומחה יחסי ציבור",
     "PSYCHOLOGISTHRSPECIALIST": "פסיכולוג/מומחה משאבי אנוש",
-    "LEGALCOMPLIANCEOFFICER": "אחראי ציות משפטי"
+    "LEGALCOMPLIANCEOFFICER": "אחראי ציות משפטי",
+    "project_name": "שם הפרוייקט",
+    "project_description": "תיאור הפרוייקט",
+    "description": "תיאור",
+    "what_roles_do_you_need": "איזה תפקידים דרושים לפרוייקט?",
+    "add": "הוסף.י"
 }
