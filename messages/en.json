@@ -17,5 +17,15 @@
     "password": "Password",
     "forgot_your_password": "Forgot Your Password?",
     "dont_have_an_account": "Don't have an account?",
-    "sign_up": "Sign up"
+    "sign_up": "Sign up",
+    "at_least_2_char": "At least 2 characters are required for name",
+    "field_required": "Field required",
+    "enter_valid_email": "Enter valid email",
+    "toggle_theme": "Toggle theme",
+    "settings": "Settings",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "logout": "Logout",
+    "signed_out_success": "Signed out successfully"
 }

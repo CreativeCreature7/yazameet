@@ -10,11 +10,22 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useTranslations } from "next-intl";
 import { Icons } from "@/components/Icons";
+import { getProviders, signIn } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/server/auth";
+import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { LoginForm } from "@/app/_components/login-form";
 
-export default function Login() {
-  const t = useTranslations();
+export default async function Login() {
+  const session = await getServerSession(authOptions);
+  if (session) {
+    redirect("/projects");
+  }
+  const providers = await getProviders();
+
+  const t = await getTranslations();
 
   return (
     <Card className="fixed left-1/2 top-1/2 mx-auto max-w-sm -translate-x-1/2 -translate-y-1/2">
@@ -23,52 +34,7 @@ export default function Login() {
         <CardDescription>{t("enter_your_email_below")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">{t("email")}</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">{t("password")}</Label>
-              <Link
-                href="/auth/forgot-password"
-                className="ms-auto inline-block text-sm underline"
-              >
-                {t("forgot_your_password")}
-              </Link>
-            </div>
-            <Input id="password" type="password" required />
-          </div>
-          <Button type="submit" className="w-full">
-            {t("login")}
-          </Button>
-          <div className="flex flex-row gap-3">
-            <Button
-              variant="outline"
-              className="inline-flex w-full items-center justify-center"
-            >
-              <Icons.google className="h-5" />
-            </Button>
-            <Button
-              variant="outline"
-              className="inline-flex w-full items-center justify-center"
-            >
-              <Icons.discord className="h-5" />
-            </Button>
-          </div>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          {t("dont_have_an_account")}{" "}
-          <Link href="/auth/sign-up" className="underline">
-            {t("sign_up")}
-          </Link>
-        </div>
+        <LoginForm providers={providers} />
       </CardContent>
     </Card>
   );

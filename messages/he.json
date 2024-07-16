@@ -16,6 +16,16 @@
     "email": "אימייל",
     "password": "סיסמה",
     "forgot_your_password": "שכחת את הסיסמה שלך?",
-    "dont_have_an_account": "אין לך משתשמש?",
-    "sign_up": "הרשם.י"
+    "dont_have_an_account": ".אין לך משתמש?",
+    "sign_up": "הרשם.י",
+    "at_least_2_char": "לפחות 2 תווים דרושים עבור שם",
+    "field_required": "שדה חובה",
+    "enter_valid_email": "הכנס.י אימייל תקין",
+    "toggle_theme": "החלפ.י צבע נושא",
+    "settings": "הגדרות",
+    "light": "בהיר",
+    "dark": "כהה",
+    "system": "מערכת",
+    "logout": "התנתק.י",
+    "signed_out_success": "התנתקת בהצלחה"
 }

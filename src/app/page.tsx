@@ -1,13 +1,12 @@
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { Button } from "@/components/ui/button";
 import { FlipWords } from "@/components/ui/flip-words";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
 export default async function Home() {
   const t = await getTranslations();
-  const locale = await getLocale();
 
   const words = [
     t("software_developers"),
@@ -82,7 +81,7 @@ export default async function Home() {
           className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"
           variant="expandIcon"
           iconPlacement="right"
-          Icon={locale === "he" ? ArrowLeft : ArrowRight}
+          Icon={ArrowRight}
           size="lg"
         >
           {t("join")}
