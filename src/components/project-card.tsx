@@ -1,31 +1,54 @@
+"use client";
+
 import React from "react";
 import { useId } from "react";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { people } from "@/lib/dummy-data";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { Project } from "@prisma/client";
+import { useTranslations } from "next-intl";
 
-type Props = {
-  id: number;
-  title: string;
-  price: string;
-};
+export function ProjectCard({
+  id,
+  name,
+  description,
+  rolesNeeded,
+  collaborators,
+}: Partial<Project>) {
+  const t = useTranslations();
 
-export function ProjectCard({ id, title, price }: Props) {
   return (
-    <div
+    <Link
       key={id}
-      className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-900 dark:to-neutral-950"
+      href={`/projects/${id}`}
+      className="relative w-full overflow-hidden rounded-3xl rounded-br-none bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-900 dark:to-neutral-950"
     >
       <Grid size={20} />
-      <div className="flex flex-row">
-        <AnimatedTooltip items={people} size="sm" />
+      <h2 className="relative z-20 truncate text-2xl font-bold text-neutral-800 dark:text-white">
+        {name}
+      </h2>
+      <div>
+        {rolesNeeded?.map((role) => (
+          <Badge key={role} className="mb-2 me-2 last:me-0">
+            {t(role)}
+          </Badge>
+        ))}
       </div>
-      <p className="relative z-20 text-base font-bold text-neutral-800 dark:text-white">
-        {title}
+      <p className="relative z-20 mb-4 line-clamp-3 text-base font-normal text-neutral-600 dark:text-neutral-400">
+        {description}
       </p>
-      <p className="relative z-20 mt-4 text-base font-normal text-neutral-600 dark:text-neutral-400">
-        {price}
-      </p>
-    </div>
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row">
+          <AnimatedTooltip
+            items={people}
+            size="sm"
+            plusButton={true}
+            onPlusClick={() => console.log("click")}
+          />
+        </div>
+      </div>
+    </Link>
   );
 }
 

@@ -10,13 +10,15 @@ import {
 } from "framer-motion";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { PlusIcon } from "lucide-react";
 
 const tooltipVariants = cva(
   "relative !m-0 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105",
   {
     variants: {
       size: {
-        sm: "h-12 w-12",
+        sm: "h-10 w-10",
         default: "h-14 w-14",
       },
     },
@@ -34,9 +36,16 @@ type Props = {
     image: string;
   }[];
   size?: "default" | "sm";
+  plusButton?: boolean;
+  onPlusClick?: () => void;
 };
 
-export const AnimatedTooltip = ({ items, size }: Props) => {
+export const AnimatedTooltip = ({
+  items,
+  size,
+  plusButton,
+  onPlusClick,
+}: Props) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const springConfig = { stiffness: 100, damping: 5 };
   const x = useMotionValue(0); // going to set this value on mouse move
@@ -59,7 +68,7 @@ export const AnimatedTooltip = ({ items, size }: Props) => {
     <>
       {items.map((item, idx) => (
         <div
-          className="group relative -mr-4"
+          className="group relative -me-4"
           key={item.name}
           onMouseEnter={() => setHoveredIndex(item.id)}
           onMouseLeave={() => setHoveredIndex(null)}
@@ -105,6 +114,15 @@ export const AnimatedTooltip = ({ items, size }: Props) => {
           />
         </div>
       ))}
+      {plusButton && (
+        <Button
+          variant="ghost"
+          className={`${cn(tooltipVariants({ size }))} bg-accent hover:border-black hover:bg-accent-foreground hover:text-accent`}
+          onClick={onPlusClick}
+        >
+          <PlusIcon className={cn(size)} />
+        </Button>
+      )}
     </>
   );
 };

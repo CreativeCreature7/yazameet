@@ -1,84 +1,49 @@
 "use client";
+
 import React from "react";
 import InfiniteScroll from "@/components/ui/infinite-scroll";
 import { Loader2 } from "lucide-react";
 import { ProjectCard } from "@/components/project-card";
-
-interface DummyProductResponse {
-  products: DummyProduct[];
-  total: number;
-  skip: number;
-  limit: number;
-}
-
-interface DummyProduct {
-  id: number;
-  title: string;
-  price: string;
-}
-
-const Product = ({ product }: { product: DummyProduct }) => {
-  return (
-    <div className="flex w-full flex-col gap-2 rounded-lg border-2 border-gray-200 p-2">
-      <div className="flex gap-2">
-        <div className="flex flex-col justify-center gap-1">
-          <div className="font-bold text-primary">
-            {product.id} - {product.title}
-          </div>
-          <div className="text-sm text-muted-foreground">{product.price}</div>
-        </div>
-      </div>
-    </div>
-  );
-};
+import { api } from "@/trpc/react";
 
 const Projects = () => {
-  const [page, setPage] = React.useState(0);
-  const [loading, setLoading] = React.useState(false);
-  const [hasMore, setHasMore] = React.useState(true);
-  const [products, setProducts] = React.useState<DummyProduct[]>([]);
+  const [latestProjects, latestProjectsQuery] =
+    api.project.infiniteProjects.useSuspenseInfiniteQuery(
+      {
+        limit: 5,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      },
+    );
 
-  const next = async () => {
-    setLoading(true);
+  const { hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } =
+    latestProjectsQuery;
 
-    /**
-     * Intentionally delay the search by 800ms before execution so that you can see the loading spinner.
-     * In your app, you can remove this setTimeout.
-     **/
-    setTimeout(async () => {
-      const res = await fetch(
-        `https://dummyjson.com/products?limit=3&skip=${3 * page}&select=title,price`,
-      );
-      const data = (await res.json()) as DummyProductResponse;
-      setProducts((prev) => [...prev, ...data.products]);
-      setPage((prev) => prev + 1);
-
-      // Usually your response will tell you if there is no more data.
-      if (data.products.length < 3) {
-        setHasMore(false);
-      }
-      setLoading(false);
-    }, 800);
-  };
-  
   return (
-    <div className="hidden-scrollbar max-h-[calc(100vh_-_14rem)] w-full overflow-y-auto">
+    <div className="hidden-scrollbar max-h-[calc(100vh_-_14.5rem)] w-full overflow-y-auto">
       <div className="flex w-full flex-col items-center gap-3">
-        {products.map((product) => (
-          <ProjectCard
-            key={product.id}
-            id={product.id}
-            price={product.price}
-            title={product.title}
-          />
+        {latestProjects?.pages.map((group, i) => (
+          <React.Fragment key={i}>
+            {group.items.map((project) => (
+              <ProjectCard
+                key={project.id}
+                id={project.id}
+                description={project.description}
+                name={project.name}
+                rolesNeeded={project.rolesNeeded}
+                collaborators={project.collaborators}
+              />
+            ))}
+          </React.Fragment>
         ))}
         <InfiniteScroll
-          hasMore={hasMore}
-          isLoading={loading}
-          next={next}
+          hasMore={hasNextPage}
+          isLoading={isFetching || isFetchingNextPage}
+          next={fetchNextPage}
           threshold={1}
         >
-          {hasMore && (
+          {hasNextPage && (
             <Loader2 className="my-4 h-8 w-8 animate-spin text-primary" />
           )}
         </InfiniteScroll>

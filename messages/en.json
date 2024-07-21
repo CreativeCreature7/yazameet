@@ -59,5 +59,6 @@
     "project_description": "Project Description",
     "description": "Description",
     "what_roles_do_you_need": "What role/s are needed for the project?",
-    "add": "Add"
+    "add": "Add",
+    "add_new_project": "Add New Project"
 }

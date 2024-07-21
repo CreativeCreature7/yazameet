@@ -1,7 +1,6 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { Button } from "@/components/ui/button";
 import {
   FormField,
   FormItem,
@@ -27,9 +26,8 @@ const BaseSchema = (t: (arg: string) => string) =>
     rolesNeeded: z.array(optionRolesSchema).min(1),
   });
 
-export function LatestProject() {
+export function ProjectForm() {
   const t = useTranslations();
-  const [LatestProject] = api.project.getLatest.useSuspenseQuery();
   const formSchema = BaseSchema(t);
   const defaultValues = {
     name: "",

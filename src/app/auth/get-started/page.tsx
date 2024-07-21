@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -46,6 +46,10 @@ import {
   profilePictureSchema,
 } from "@/lib/schemas";
 import { api } from "@/trpc/react";
+import { DropzoneOptions } from "react-dropzone";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const FileSvgDraw = () => {
   const t = useTranslations();
@@ -87,6 +91,9 @@ const BaseSchema = (t: (arg: string) => string) =>
 
 export default function SignUp() {
   const t = useTranslations();
+  const router = useRouter();
+  const { update: updateSession } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
   const OPTIONS: Option[] = Object.values(Roles).map((value) => ({
     label: t(value),
     value,
@@ -100,20 +107,48 @@ export default function SignUp() {
       profilePicture: [],
     },
   });
-  const dropZoneConfig = {
+  const dropZoneConfig: DropzoneOptions = {
+    accept: {
+      "image/jpeg": [".jpg", ".jpeg"],
+      "image/png": [".png"],
+      "image/gif": [".gif"],
+    },
     maxFiles: 1,
     maxSize: PROFILE_MAX_FILE_SIZE,
     multiple: true,
   };
-  const addDetails = api.user.addDetails.useMutation();
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const updatedValues = {
-      ...values,
-      profilePicture:
-        "https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3387&q=80",
-      roles: values.roles.map((role) => role.value),
-    };
-    addDetails.mutate(updatedValues);
+
+  const { mutate: addDetails } = api.user.addDetails.useMutation();
+  const { mutateAsync: getPresignedUrl } =
+    api.media.getPresignedUrl.useMutation();
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    const file = values.profilePicture[0]!;
+    const { uploadURL } = await getPresignedUrl({
+      fileName: file.name,
+      fileType: file.type,
+    });
+
+    const { status } = await fetch(uploadURL, {
+      method: "PUT",
+      body: file,
+      headers: {
+        "Content-type": file.type,
+      },
+    });
+
+    if (status === 200) {
+      const updatedValues = {
+        ...values,
+        profilePicture: uploadURL.split("?")[0]!,
+        roles: values.roles.map((role) => role.value),
+      };
+      addDetails(updatedValues);
+      router.replace("/projects");
+      updateSession();
+    }
+    setIsLoading(false);
   }
 
   return (
@@ -252,9 +287,13 @@ export default function SignUp() {
                     )}
                   />
                 </div>
-                <Button type="submit" className="w-full">
+                <LoadingButton
+                  type="submit"
+                  className="w-full"
+                  loading={isLoading}
+                >
                   {t("join")}
-                </Button>
+                </LoadingButton>
               </form>
             </Form>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
-import { LogOut, SettingsIcon } from "lucide-react";
+import { useEffect } from "react";
+import { LogOut } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +11,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTranslations, useLocale } from "next-intl";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function SettingsDropdown() {
+  const { data, update } = useSession();
   const t = useTranslations();
   const router = useRouter();
 
@@ -31,7 +33,10 @@ export function SettingsDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
-          <SettingsIcon className="absolute h-[1.2rem] w-[1.2rem] transition-all" />
+          <Avatar>
+            <AvatarImage src={data?.user.image!} alt={data?.user.name!} />
+            <AvatarFallback>{data?.user.name}</AvatarFallback>
+          </Avatar>
           <span className="sr-only">{t("settings")}</span>
         </Button>
       </DropdownMenuTrigger>
