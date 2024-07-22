@@ -25,6 +25,7 @@ const config = {
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-unsafe-call": "off",
     "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+    "@typescript-eslint/no-redundant-type-constituents": "off",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
       {
