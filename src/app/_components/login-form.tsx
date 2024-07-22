@@ -15,11 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
-import {
-  getProviders,
-  signIn,
-  useSession,
-} from "next-auth/react";
+import { getProviders, signIn, useSession } from "next-auth/react";
 import { Icons } from "@/components/Icons";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -35,14 +31,11 @@ const BaseSchema = (t: (arg: string) => string) =>
       .email(t("enter_valid_email")),
   });
 
-
-};
-
 export function LoginForm() {
   const t = useTranslations();
   const router = useRouter();
   const session = useSession();
-  const providers = getProviders()
+  const providers = getProviders();
   const formSchema = BaseSchema(t);
   const [emailSent, setEmailSent] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -90,22 +83,23 @@ export function LoginForm() {
         </form>
       </Form>
       <div className="mt-4 flex flex-row gap-3">
-        {providers && Object.values(providers)
-          .filter((provider) => provider.id !== "email")
-          .map((provider) => (
-            <Button
-              key={provider.name}
-              variant="outline"
-              className="inline-flex w-full items-center justify-center"
-              onClick={() => signIn(provider.id)}
-            >
-              {provider.name === "Discord" ? (
-                <Icons.discord className="h-5" />
-              ) : (
-                <Icons.google className="h-5" />
-              )}
-            </Button>
-          ))}
+        {providers &&
+          Object.values(providers)
+            .filter((provider) => provider.id !== "email")
+            .map((provider) => (
+              <Button
+                key={provider.name}
+                variant="outline"
+                className="inline-flex w-full items-center justify-center"
+                onClick={() => signIn(provider.id)}
+              >
+                {provider.name === "Discord" ? (
+                  <Icons.discord className="h-5" />
+                ) : (
+                  <Icons.google className="h-5" />
+                )}
+              </Button>
+            ))}
       </div>
     </>
   );
