@@ -10,7 +10,14 @@ const withNextIntl = createNextIntlPlugin();
 /** @type {import("next").NextConfig} */
 const config = {
   images: {
-    domains: ["images.unsplash.com"],
+    remotePatterns: [
+      {
+        hostname: "images.unsplash.com",
+      },
+      {
+        hostname: "yazameet.s3.eu-central-1.amazonaws.com",
+      },
+    ],
   },
 };
 

@@ -417,7 +417,7 @@ const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                   {option.label}
                   <button
                     className={cn(
-                      "ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                      "ms-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2",
                       (disabled || option.fixed) && "hidden",
                     )}
                     onKeyDown={(e) => {
@@ -479,7 +479,7 @@ const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                 onChange?.(selected.filter((s) => s.fixed));
               }}
               className={cn(
-                "absolute right-0 h-6 w-6 p-0",
+                "absolute h-6 w-6 p-0 ltr:right-0 rtl:left-0",
                 (hideClearAllButton ||
                   disabled ||
                   selected.length < 1 ||

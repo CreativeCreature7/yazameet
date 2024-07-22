@@ -1,66 +1,41 @@
-import Link from "next/link";
-
-import { LatestPost } from "@/app/_components/post";
+import { ProjectForm } from "@/app/_components/project-form";
 import { getServerAuthSession } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
+import Projects from "@/components/projects";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { getTranslations } from "next-intl/server";
+import { PlusIcon } from "lucide-react";
 
-export default async function Projects() {
-  const hello = await api.post.hello({ text: "from tRPC" });
+export default async function ProjectsList() {
+  const t = await getTranslations();
   const session = await getServerAuthSession();
 
-  void api.post.getLatest.prefetch();
+  void api.project.infiniteProjects.prefetchInfinite({
+    limit: 5,
+  });
 
   return (
     <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
-
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
-              </p>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
+      <main className="flex h-full flex-col items-start justify-start">
+        <div className="mb-4 w-full rounded-3xl border border-neutral-200 bg-white p-3 shadow-xl shadow-black/[0.1] dark:border-white/[0.1] dark:bg-black dark:shadow-white/[0.05]">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="expandIcon"
+                iconPlacement="right"
+                Icon={PlusIcon}
+                disabled={!session?.user}
               >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
-            </div>
-          </div>
-
-          {session?.user && <LatestPost />}
+                {t("add_new_project")}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="hidden-scrollbar overflow-y-scroll">
+              {session?.user && <ProjectForm />}
+            </DialogContent>
+          </Dialog>
         </div>
+        <Projects />
       </main>
     </HydrateClient>
   );

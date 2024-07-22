@@ -8,18 +8,47 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
+import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { PlusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+
+const tooltipVariants = cva(
+  "relative !m-0 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105",
+  {
+    variants: {
+      size: {
+        sm: "h-10 w-10",
+        default: "h-14 w-14",
+      },
+    },
+    defaultVariants: {
+      size: "default",
+    },
+  },
+);
+
+type Props = {
+  items: {
+    id: string;
+    name: string | null;
+    year: string | null;
+    image: string | null;
+  }[];
+  size?: "default" | "sm";
+  onPlusClick?: () => void;
+  shouldShowPlusClick?: boolean;
+};
 
 export const AnimatedTooltip = ({
   items,
-}: {
-  items: {
-    id: number;
-    name: string;
-    designation: string;
-    image: string;
-  }[];
-}) => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  size,
+  onPlusClick,
+  shouldShowPlusClick,
+}: Props) => {
+  const t = useTranslations();
+  const [hoveredIndex, setHoveredIndex] = useState<string | null>(null);
   const springConfig = { stiffness: 100, damping: 5 };
   const x = useMotionValue(0); // going to set this value on mouse move
   // rotate the tooltip
@@ -41,7 +70,7 @@ export const AnimatedTooltip = ({
     <>
       {items.map((item, idx) => (
         <div
-          className="group relative -mr-4"
+          className="group relative -me-4"
           key={item.name}
           onMouseEnter={() => setHoveredIndex(item.id)}
           onMouseLeave={() => setHoveredIndex(null)}
@@ -73,7 +102,7 @@ export const AnimatedTooltip = ({
                 <div className="relative z-30 text-base font-bold text-white">
                   {item.name}
                 </div>
-                <div className="text-xs text-white">{item.designation}</div>
+                <div className="text-xs text-white">{t(item.year)}</div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -81,12 +110,24 @@ export const AnimatedTooltip = ({
             onMouseMove={handleMouseMove}
             height={100}
             width={100}
-            src={item.image}
-            alt={item.name}
-            className="relative !m-0 h-14 w-14 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105"
+            src={item.image as string}
+            alt={item.name as string}
+            className={cn(tooltipVariants({ size }))}
           />
         </div>
       ))}
+      {shouldShowPlusClick && onPlusClick && (
+        <Button
+          variant="ghost"
+          className={`${cn(tooltipVariants({ size }))} bg-accent hover:border-black hover:bg-accent-foreground hover:text-accent`}
+          onClick={(e) => {
+            e.preventDefault();
+            onPlusClick();
+          }}
+        >
+          <PlusIcon className={cn(size)} />
+        </Button>
+      )}
     </>
   );
 };
