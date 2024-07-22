@@ -196,14 +196,14 @@ export default function SignUp() {
                           </FormControl>
                           {Year && (
                             <SelectContent className="w-[180px]">
-                              <SelectItem value={Year.FIRST}>
-                                {t("year_1")}
+                              <SelectItem value={Year.FIRSTYEAR}>
+                                {t(Year.FIRSTYEAR)}
                               </SelectItem>
-                              <SelectItem value={Year.SECOND}>
-                                {t("year_2")}
+                              <SelectItem value={Year.SECONDYEAR}>
+                                {t(Year.SECONDYEAR)}
                               </SelectItem>
-                              <SelectItem value={Year.THIRD}>
-                                {t("year_3")}
+                              <SelectItem value={Year.THIRDYEAR}>
+                                {t(Year.THIRDYEAR)}
                               </SelectItem>
                             </SelectContent>
                           )}

@@ -12,7 +12,7 @@
     "connect_with": "התחבר עם",
     "join": "הצטרפות",
     "login": "כניסה",
-    "enter_your_email_below": "הכנס.י את האימייל והסיסמה שלך כדי להכנס",
+    "enter_your_email_below": "הכנס.י את האימייל והסיסמה שלך כדי להכנס/ליצור משתמש חדש",
     "email": "אימייל",
     "password": "סיסמה",
     "forgot_your_password": "שכחת את הסיסמה שלך?",
@@ -37,9 +37,9 @@
     "what_are_your_roles": "מה הם התפקיד/ים שלך?",
     "select_your_roles": "בחר.י את התפקיד/ים שלך",
     "tyler_durden": "טיילר דירדן",
-    "year_1": "שנה א׳",
-    "year_2": "שנה ב׳",
-    "year_3": "שנה ג׳",
+    "FIRSTYEAR": "שנה א׳",
+    "SECONDYEAR": "שנה ב׳",
+    "THIRDYEAR": "שנה ג׳",
     "no_results": "אין תוצאות",
     "png_jpg_or_gif":"PNG, JPG או GIF",
     "or_drag_and_drop": "או גרור ושחרר",
@@ -60,5 +60,7 @@
     "description": "תיאור",
     "what_roles_do_you_need": "איזה תפקידים דרושים לפרוייקט?",
     "add": "הוסף.י",
-    "add_new_project": "הוסף.י פרוייקט חדש"
+    "add_new_project": "הוסף.י פרוייקט חדש",
+    "read_more": "קרא עוד...",
+    "email_sent_to": "אימיל נשלח ל"
 }

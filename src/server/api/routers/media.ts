@@ -21,8 +21,8 @@ export const mediaRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { fileName, fileType } = input;
       const params = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: `${ctx.session.user.id}/${fileName}`,
+        Bucket: env.S3_BUCKET_NAME,
+        Key: `${ctx.session.user.id}/${crypto.randomUUID()}`,
         Expires: 60,
         ContentType: fileType,
       };

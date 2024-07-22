@@ -14,6 +14,9 @@ const config = {
       {
         hostname: "images.unsplash.com",
       },
+      {
+        hostname: "yazameet.s3.eu-central-1.amazonaws.com",
+      },
     ],
   },
 };

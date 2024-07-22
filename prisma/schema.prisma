@@ -7,22 +7,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Project {
-    id          Int      @id @default(autoincrement())
-    name        String
-    description String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    collaborators String[]
-    rolesNeeded   Roles[]
-
-    @@index([name])
-}
-
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
@@ -52,17 +36,18 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    roles         Roles[]
-    year          Year?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Project[]
-    Media         Media[]
+    id             String    @id @default(cuid())
+    name           String?
+    email          String?   @unique
+    emailVerified  DateTime?
+    image          String?
+    roles          Roles[]
+    year           Year?
+    accounts       Account[]
+    sessions       Session[]
+    projects       Project[]
+    media          Media[]
+    collaborations Project[] @relation("ProjectCollaborators")
 }
 
 model VerificationToken {
@@ -71,6 +56,22 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Project {
+    id          Int      @id @default(autoincrement())
+    name        String
+    description String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdById String
+
+    collaborators User[]  @relation(name: "ProjectCollaborators")
+    rolesNeeded   Roles[]
+
+    @@index([name])
 }
 
 model Media {
@@ -98,9 +99,9 @@ enum Roles {
 }
 
 enum Year {
-    FIRST
-    SECOND
-    THIRD
+    FIRSTYEAR
+    SECONDYEAR
+    THIRDYEAR
 }
 
 enum MediaType {

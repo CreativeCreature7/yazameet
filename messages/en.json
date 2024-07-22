@@ -12,7 +12,7 @@
     "connect_with": "Connect With",
     "join": "Join",
     "login": "Login",
-    "enter_your_email_below": "Enter your email below to login to your account",
+    "enter_your_email_below": "Enter your email below to login/create account",
     "email": "Email",
     "password": "Password",
     "forgot_your_password": "Forgot Your Password?",
@@ -37,9 +37,9 @@
     "what_are_your_roles": "What Are Your Role/s?",
     "select_your_roles": "Select your role/s",
     "tyler_durden": "Tyler Durden",
-    "year_1": "1st year",
-    "year_2": "2nd year",
-    "year_3": "3rd year",
+    "FIRSTYEAR": "1st year",
+    "SECONDYEAR": "2nd year",
+    "THIRDYEAR": "3rd year",
     "no_results": "No Results",
     "png_jpg_or_gif":"PNG, JPG or GIF",
     "or_drag_and_drop": "or drag and drop",
@@ -60,5 +60,7 @@
     "description": "Description",
     "what_roles_do_you_need": "What role/s are needed for the project?",
     "add": "Add",
-    "add_new_project": "Add New Project"
+    "add_new_project": "Add New Project",
+    "read_more": "Read More...",
+    "email_sent_to": "Email sent to"
 }

@@ -12,6 +12,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const tooltipVariants = cva(
   "relative !m-0 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105",
@@ -30,23 +31,24 @@ const tooltipVariants = cva(
 
 type Props = {
   items: {
-    id: number;
-    name: string;
-    designation: string;
-    image: string;
+    id: string;
+    name: string | null;
+    year: string | null;
+    image: string | null;
   }[];
   size?: "default" | "sm";
-  plusButton?: boolean;
   onPlusClick?: () => void;
+  shouldShowPlusClick?: boolean;
 };
 
 export const AnimatedTooltip = ({
   items,
   size,
-  plusButton,
   onPlusClick,
+  shouldShowPlusClick,
 }: Props) => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const t = useTranslations();
+  const [hoveredIndex, setHoveredIndex] = useState<string | null>(null);
   const springConfig = { stiffness: 100, damping: 5 };
   const x = useMotionValue(0); // going to set this value on mouse move
   // rotate the tooltip
@@ -100,7 +102,7 @@ export const AnimatedTooltip = ({
                 <div className="relative z-30 text-base font-bold text-white">
                   {item.name}
                 </div>
-                <div className="text-xs text-white">{item.designation}</div>
+                <div className="text-xs text-white">{t(item.year)}</div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -108,17 +110,20 @@ export const AnimatedTooltip = ({
             onMouseMove={handleMouseMove}
             height={100}
             width={100}
-            src={item.image}
-            alt={item.name}
+            src={item.image as string}
+            alt={item.name as string}
             className={cn(tooltipVariants({ size }))}
           />
         </div>
       ))}
-      {plusButton && (
+      {shouldShowPlusClick && onPlusClick && (
         <Button
           variant="ghost"
           className={`${cn(tooltipVariants({ size }))} bg-accent hover:border-black hover:bg-accent-foreground hover:text-accent`}
-          onClick={onPlusClick}
+          onClick={(e) => {
+            e.preventDefault();
+            onPlusClick();
+          }}
         >
           <PlusIcon className={cn(size)} />
         </Button>

@@ -46,15 +46,72 @@ export const projectRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
+        include: {
+          collaborators: true,
+          createdBy: true,
+        },
       });
       let nextCursor: typeof cursor | undefined = undefined;
       if (items.length > limit) {
         const nextItem = items.pop();
         nextCursor = nextItem!.id;
       }
+
+      const itemsWithAllCollaborators = items.map((project) => ({
+        ...project,
+        collaborators: [project.createdBy, ...project.collaborators],
+      }));
+
       return {
-        items,
+        items: itemsWithAllCollaborators,
         nextCursor,
       };
+    }),
+
+  getProject: publicProcedure
+    .input(
+      z.object({
+        id: z.number().min(1),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { id } = input;
+      const project = await ctx.db.project.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          collaborators: true,
+          createdBy: true,
+        },
+      });
+      if (!project) return null;
+
+      return {
+        ...project,
+        collaborators: [project.createdBy, ...project.collaborators],
+      };
+    }),
+
+  addCollaborator: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id } = input;
+      const project = await ctx.db.project.update({
+        where: {
+          id,
+        },
+        data: {
+          collaborators: {
+            connect: { id: ctx.session?.user.id },
+          },
+        },
+      });
+
+      return project;
     }),
 });

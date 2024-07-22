@@ -1,13 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useId } from "react";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
-import { people } from "@/lib/dummy-data";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { Project } from "@prisma/client";
+import { Roles, User } from "@prisma/client";
 import { useTranslations } from "next-intl";
+import { api } from "@/trpc/react";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { ArrowDown, ArrowUp } from "lucide-react";
+
+type Props = {
+  id: number;
+  name: string;
+  description: string;
+  rolesNeeded: Roles[];
+  collaborators: User[];
+};
 
 export function ProjectCard({
   id,
@@ -15,13 +25,28 @@ export function ProjectCard({
   description,
   rolesNeeded,
   collaborators,
-}: Partial<Project>) {
+}: Props) {
   const t = useTranslations();
+  const utils = api.useUtils();
+  const session = useSession();
+  const [readMore, setReadMore] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement | null>(null);
+  const { mutate: addCollaborator } = api.project.addCollaborator.useMutation({
+    onSuccess: async () => {
+      await utils.project.infiniteProjects.invalidate();
+    },
+  });
+
+  const isEllipsisActive = () => {
+    return (
+      descriptionRef.current &&
+      descriptionRef.current.offsetHeight < descriptionRef.current.scrollHeight
+    );
+  };
 
   return (
-    <Link
+    <div
       key={id}
-      href={`/projects/${id}`}
       className="relative w-full overflow-hidden rounded-3xl rounded-br-none bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-900 dark:to-neutral-950"
     >
       <Grid size={20} />
@@ -35,20 +60,36 @@ export function ProjectCard({
           </Badge>
         ))}
       </div>
-      <p className="relative z-20 mb-4 line-clamp-3 text-base font-normal text-neutral-600 dark:text-neutral-400">
+      <p
+        ref={descriptionRef}
+        className={`relative z-20 ${isEllipsisActive() && "mb-0"} ${readMore ? "line-clamp-none" : "line-clamp-3"} text-base font-normal text-neutral-600 dark:text-neutral-400`}
+      >
         {description}
       </p>
-      <div className="flex flex-row justify-between">
+      {isEllipsisActive() && !readMore && (
+        <Button
+          className="p-0"
+          variant="linkHover2"
+          onClick={() => setReadMore(!readMore)}
+        >
+          {t("read_more")}
+        </Button>
+      )}
+      <div className="mt-4 flex flex-row justify-between">
         <div className="flex flex-row">
           <AnimatedTooltip
-            items={people}
+            items={collaborators}
             size="sm"
-            plusButton={true}
-            onPlusClick={() => console.log("click")}
+            onPlusClick={() => addCollaborator({ id })}
+            shouldShowPlusClick={
+              !collaborators.some(
+                (collaborator) => collaborator.id === session.data?.user.id,
+              )
+            }
           />
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
