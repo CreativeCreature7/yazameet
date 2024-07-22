@@ -5,12 +5,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getProviders } from "next-auth/react";
 import { getTranslations } from "next-intl/server";
 import { LoginForm } from "@/app/_components/login-form";
 
 export default async function Login() {
-  const providers = await getProviders();
   const t = await getTranslations();
 
   return (
@@ -20,7 +18,7 @@ export default async function Login() {
         <CardDescription>{t("enter_your_email_below")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <LoginForm providers={providers} />
+        <LoginForm />
       </CardContent>
     </Card>
   );

@@ -35,7 +35,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
-      {!session?.user ? (
+      {!session ? (
         <Link href={"/auth/sign-in"}>
           <Button
             className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"

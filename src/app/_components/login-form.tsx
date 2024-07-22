@@ -16,12 +16,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 import {
-  ClientSafeProvider,
-  LiteralUnion,
+  getProviders,
   signIn,
   useSession,
 } from "next-auth/react";
-import { BuiltInProviderType } from "next-auth/providers/index";
 import { Icons } from "@/components/Icons";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -37,17 +35,14 @@ const BaseSchema = (t: (arg: string) => string) =>
       .email(t("enter_valid_email")),
   });
 
-type Props = {
-  providers: Record<
-    LiteralUnion<BuiltInProviderType, string>,
-    ClientSafeProvider
-  > | null;
+
 };
 
-export function LoginForm({ providers }: Props) {
+export function LoginForm() {
   const t = useTranslations();
   const router = useRouter();
   const session = useSession();
+  const providers = getProviders()
   const formSchema = BaseSchema(t);
   const [emailSent, setEmailSent] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
