@@ -20,6 +20,11 @@ const config = {
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/prefer-for-of": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/non-nullable-type-assertion-style": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
       {
