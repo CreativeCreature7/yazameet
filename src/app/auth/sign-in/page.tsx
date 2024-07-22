@@ -1,6 +1,3 @@
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,23 +5,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Icons } from "@/components/Icons";
-import { getProviders, signIn } from "next-auth/react";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/server/auth";
-import { redirect } from "next/navigation";
+import { getProviders } from "next-auth/react";
 import { getTranslations } from "next-intl/server";
 import { LoginForm } from "@/app/_components/login-form";
 
 export default async function Login() {
-  const session = await getServerSession(authOptions);
-  if (session) {
-    redirect("/projects");
-  }
   const providers = await getProviders();
-
   const t = await getTranslations();
 
   return (

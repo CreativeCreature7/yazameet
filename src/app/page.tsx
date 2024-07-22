@@ -5,9 +5,11 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { people } from "@/lib/dummy-data";
+import { getServerSession } from "next-auth";
 
 export default async function Home() {
   const t = await getTranslations();
+  const session = await getServerSession();
 
   const words = [
     t("software_developers"),
@@ -33,17 +35,31 @@ export default async function Home() {
           </div>
         </div>
       </div>
-      <Link href={"/auth/sign-in"}>
-        <Button
-          className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"
-          variant="expandIcon"
-          iconPlacement="right"
-          Icon={ArrowRight}
-          size="lg"
-        >
-          {t("join")}
-        </Button>
-      </Link>
+      {!session?.user ? (
+        <Link href={"/auth/sign-in"}>
+          <Button
+            className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"
+            variant="expandIcon"
+            iconPlacement="right"
+            Icon={ArrowRight}
+            size="lg"
+          >
+            {t("join")}
+          </Button>
+        </Link>
+      ) : (
+        <Link href={"/projects"}>
+          <Button
+            className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"
+            variant="expandIcon"
+            iconPlacement="right"
+            Icon={ArrowRight}
+            size="lg"
+          >
+            {t("projects")}
+          </Button>
+        </Link>
+      )}
     </main>
   );
 }

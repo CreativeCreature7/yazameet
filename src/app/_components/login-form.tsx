@@ -15,11 +15,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
-import { ClientSafeProvider, LiteralUnion, signIn } from "next-auth/react";
+import {
+  ClientSafeProvider,
+  LiteralUnion,
+  signIn,
+  useSession,
+} from "next-auth/react";
 import { BuiltInProviderType } from "next-auth/providers/index";
 import { Icons } from "@/components/Icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const BaseSchema = (t: (arg: string) => string) =>
   z.object({
@@ -40,6 +46,8 @@ type Props = {
 
 export function LoginForm({ providers }: Props) {
   const t = useTranslations();
+  const router = useRouter();
+  const session = useSession();
   const formSchema = BaseSchema(t);
   const [emailSent, setEmailSent] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,6 +65,12 @@ export function LoginForm({ providers }: Props) {
     toast.success(`${t("email_sent_to")}: ${values.email}`);
     setEmailSent(true);
   }
+
+  useEffect(() => {
+    if (session.data?.user) {
+      router.replace("/projects");
+    }
+  }, [session, router]);
 
   return (
     <>
