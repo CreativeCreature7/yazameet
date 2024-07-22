@@ -83,23 +83,22 @@ export function LoginForm() {
         </form>
       </Form>
       <div className="mt-4 flex flex-row gap-3">
-        {providers &&
-          Object.values(providers)
-            .filter((provider) => provider.id !== "email")
-            .map((provider) => (
-              <Button
-                key={provider.name}
-                variant="outline"
-                className="inline-flex w-full items-center justify-center"
-                onClick={() => signIn(provider.id)}
-              >
-                {provider.name === "Discord" ? (
-                  <Icons.discord className="h-5" />
-                ) : (
-                  <Icons.google className="h-5" />
-                )}
-              </Button>
-            ))}
+        {Object.values(providers)
+          .filter((provider) => provider.id !== "email")
+          .map((provider) => (
+            <Button
+              key={provider.name}
+              variant="outline"
+              className="inline-flex w-full items-center justify-center"
+              onClick={() => signIn(provider.id)}
+            >
+              {provider.name === "Discord" ? (
+                <Icons.discord className="h-5" />
+              ) : (
+                <Icons.google className="h-5" />
+              )}
+            </Button>
+          ))}
       </div>
     </>
   );
