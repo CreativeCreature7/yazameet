@@ -95,7 +95,7 @@ export function LoginForm({ providers }: Props) {
         </form>
       </Form>
       <div className="mt-4 flex flex-row gap-3">
-        {Object.values(providers!)
+        {providers && Object.values(providers)
           .filter((provider) => provider.id !== "email")
           .map((provider) => (
             <Button
