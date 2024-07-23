@@ -1,7 +1,7 @@
 import { ProjectForm } from "@/app/_components/project-form";
 import { getServerAuthSession } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
-import Projects from "@/components/projects";
+import Projects from "@/app/_components/projects";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";

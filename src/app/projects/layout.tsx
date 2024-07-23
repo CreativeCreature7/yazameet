@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 export default async function ProjectsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return <div className="mx-10 pt-36">{children}</div>;
+  return <div className="mx-4 pt-36 lg:mx-10">{children}</div>;
 }

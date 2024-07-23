@@ -152,7 +152,7 @@ export default function SignUp() {
   }
 
   return (
-    <Card className="fixed left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 md:mx-auto">
+    <Card className="fixed left-1/2 top-1/2 mx-auto w-[calc(100%_-_40px)] max-w-sm -translate-x-1/2 -translate-y-1/2 lg:w-full">
       <CardHeader>
         <CardTitle className="text-2xl">{t("profile_details")}</CardTitle>
         <CardDescription>{t("in_order_to_continue")}</CardDescription>
