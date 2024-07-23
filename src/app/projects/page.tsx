@@ -19,21 +19,7 @@ export default async function ProjectsList() {
     <HydrateClient>
       <main className="flex h-full flex-col items-start justify-start">
         <div className="mb-4 w-full rounded-3xl border border-neutral-200 bg-white p-3 shadow-xl shadow-black/[0.1] dark:border-white/[0.1] dark:bg-black dark:shadow-white/[0.05]">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="expandIcon"
-                iconPlacement="right"
-                Icon={PlusIcon}
-                disabled={!session?.user}
-              >
-                {t("add_new_project")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="hidden-scrollbar overflow-y-scroll">
-              {session?.user && <ProjectForm />}
-            </DialogContent>
-          </Dialog>
+          <ProjectForm />
         </div>
         <Projects />
       </main>

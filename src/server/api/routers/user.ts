@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { Roles, Year } from "@prisma/client";
 
 export const userRouter = createTRPCRouter({
@@ -26,4 +30,18 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
+  getLatestUsers: publicProcedure.query(({ ctx }) => {
+    return ctx.db.user.findMany({
+      take: 6,
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        name: true,
+        year: true,
+        image: true,
+      },
+    });
+  }),
 });

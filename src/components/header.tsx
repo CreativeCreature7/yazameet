@@ -22,11 +22,13 @@ export function Header() {
       </div>
       <Link className="col-start-5 col-end-9" href={"/"}>
         <Image
+          priority={true}
           className="grid-s cursor-pointer dark:hidden"
           src={LogoDark}
           alt="Logo"
         />
         <Image
+          priority={true}
           className="grid-s hidden cursor-pointer dark:block"
           src={LogoLight}
           alt="Logo"
