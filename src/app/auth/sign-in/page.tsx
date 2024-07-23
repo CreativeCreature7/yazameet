@@ -14,7 +14,7 @@ export default async function Login() {
   const providers = await getProviders();
 
   return (
-    <Card className="fixed left-1/2 top-1/2 mx-auto max-w-sm -translate-x-1/2 -translate-y-1/2">
+    <Card className="fixed left-1/2 top-1/2 mx-auto w-[calc(100%_-_40px)] max-w-sm -translate-x-1/2 -translate-y-1/2 lg:w-full">
       <CardHeader>
         <CardTitle className="text-center text-2xl">{t("login")}</CardTitle>
         <CardDescription>{t("enter_your_email_below")}</CardDescription>

@@ -63,5 +63,6 @@
     "add_new_project": "Add New Project",
     "read_more": "Read More...",
     "email_sent_to": "Email sent to",
-    "projects": "Projects"
+    "projects": "Projects",
+    "project_added_successfully": "Project added successfully"
 }

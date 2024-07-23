@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useId } from "react";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,6 @@ import { useTranslations } from "next-intl";
 import { api } from "@/trpc/react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, ArrowUp } from "lucide-react";
 
 type Props = {
   id: number;
@@ -30,6 +29,7 @@ export function ProjectCard({
   const utils = api.useUtils();
   const session = useSession();
   const [readMore, setReadMore] = useState(false);
+  const [ellipsisActive, setEllipsisActive] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement | null>(null);
   const { mutate: addCollaborator } = api.project.addCollaborator.useMutation({
     onSuccess: async () => {
@@ -43,6 +43,10 @@ export function ProjectCard({
       descriptionRef.current.offsetHeight < descriptionRef.current.scrollHeight
     );
   };
+
+  useEffect(() => {
+    setEllipsisActive(!!isEllipsisActive());
+  }, [descriptionRef.current]);
 
   return (
     <div
@@ -62,11 +66,11 @@ export function ProjectCard({
       </div>
       <p
         ref={descriptionRef}
-        className={`relative z-20 ${isEllipsisActive() && "mb-0"} ${readMore ? "line-clamp-none" : "line-clamp-3"} text-base font-normal text-neutral-600 dark:text-neutral-400`}
+        className={`relative z-20 ${ellipsisActive && "mb-0"} ${readMore ? "line-clamp-none" : "line-clamp-3"} text-base font-normal text-neutral-600 dark:text-neutral-400`}
       >
         {description}
       </p>
-      {isEllipsisActive() && !readMore && (
+      {ellipsisActive && !readMore && (
         <Button
           className="p-0"
           variant="linkHover2"

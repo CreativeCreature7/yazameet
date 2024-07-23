@@ -15,19 +15,21 @@ export function Header() {
 
   return (
     <div className="fixed top-0 grid w-full grid-cols-12">
-      <div className="col-span-3 ms-10 flex flex-row items-center gap-2">
+      <div className="col-span-6 ms-6 flex flex-row items-center gap-2 lg:col-span-3 lg:ms-10">
         {status === "authenticated" && <SettingsDropdown />}
         <ThemeToggle />
         <LanguageSwitcher />
       </div>
-      <Link className="col-start-5 col-end-9" href={"/"}>
+      <Link className="col-span-6 lg:col-start-5 lg:col-end-9" href={"/"}>
         <Image
-          className="grid-s cursor-pointer dark:hidden"
+          priority={true}
+          className="cursor-pointer dark:hidden"
           src={LogoDark}
           alt="Logo"
         />
         <Image
-          className="grid-s hidden cursor-pointer dark:block"
+          priority={true}
+          className="hidden cursor-pointer dark:block"
           src={LogoLight}
           alt="Logo"
         />
