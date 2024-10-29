@@ -205,6 +205,9 @@ export default function SignUp() {
                               <SelectItem value={Year.THIRDYEAR}>
                                 {t(Year.THIRDYEAR)}
                               </SelectItem>
+                              <SelectItem value={Year.FOURTHYEAR}>
+                                {t(Year.FOURTHYEAR)}
+                              </SelectItem>
                             </SelectContent>
                           )}
                         </Select>

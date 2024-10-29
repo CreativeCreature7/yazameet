@@ -40,6 +40,7 @@
     "FIRSTYEAR": "שנה א׳",
     "SECONDYEAR": "שנה ב׳",
     "THIRDYEAR": "שנה ג׳",
+    "FOURTHYEAR": "שנה ד׳",
     "no_results": "אין תוצאות",
     "png_jpg_or_gif":"PNG, JPG או GIF",
     "or_drag_and_drop": "או גרור ושחרר",
@@ -64,5 +65,13 @@
     "read_more": "קרא עוד...",
     "email_sent_to": "אימיל נשלח ל",
     "projects": "פרוייקטים",
-    "project_added_successfully": "פרויקט הוסף בהצלחה!"
+    "project_added_successfully": "פרויקט הוסף בהצלחה!",
+    "search_projects": "חפשו פרוייקטים...",
+    "what_type_of_project_is_this": "מה סוג הפרוייקט הזה?",
+    "select_your_project_type": "בחר.י את סוג הפרוייקט שלך",
+    "NONPROFIT": "ללא מטרות רווח",
+    "FORPROFIT": "עסקי",
+    "IMPACT": "אימפקט",
+    "filter_by_project_type": "סוג פרוייקט",
+    "filter_by_roles_needed": "תפקידים דרושים"
 }

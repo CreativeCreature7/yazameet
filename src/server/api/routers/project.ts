@@ -5,7 +5,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
-import { Roles } from "@prisma/client";
+import { ProjectType, Roles } from "@prisma/client";
 
 export const projectRouter = createTRPCRouter({
   create: protectedProcedure
@@ -14,17 +14,16 @@ export const projectRouter = createTRPCRouter({
         name: z.string().min(1),
         description: z.string().min(1),
         rolesNeeded: z.array(z.nativeEnum(Roles)),
+        type: z.array(z.nativeEnum(ProjectType)),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // simulate a slow db call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       return ctx.db.project.create({
         data: {
           name: input.name,
           description: input.description,
           rolesNeeded: input.rolesNeeded,
+          type: input.type,
           createdBy: { connect: { id: ctx.session.user.id } },
         },
       });
@@ -35,6 +34,9 @@ export const projectRouter = createTRPCRouter({
       z.object({
         limit: z.number().min(1).max(100).nullish(),
         cursor: z.number().nullish(),
+        query: z.string().nullish(),
+        types: z.array(z.nativeEnum(ProjectType)).optional(),
+        roles: z.array(z.nativeEnum(Roles)).optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -49,6 +51,27 @@ export const projectRouter = createTRPCRouter({
         include: {
           collaborators: true,
           createdBy: true,
+        },
+        where: {
+          AND: [
+            {
+              OR: [
+                { name: { contains: input.query ?? "", mode: "insensitive" } },
+                {
+                  description: {
+                    contains: input.query ?? "",
+                    mode: "insensitive",
+                  },
+                },
+              ],  
+            },
+            input.types && input.types.length > 0
+              ? { type: { hasSome: input.types } }
+              : {},
+            input.roles && input.roles.length > 0
+              ? { rolesNeeded: { hasSome: input.roles } }
+              : {},
+          ],
         },
       });
       let nextCursor: typeof cursor | undefined = undefined;

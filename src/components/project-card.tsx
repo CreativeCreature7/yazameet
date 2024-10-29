@@ -4,17 +4,24 @@ import React, { useEffect, useRef, useState } from "react";
 import { useId } from "react";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { Badge } from "@/components/ui/badge";
-import { Roles, User } from "@prisma/client";
+import { Roles, User, ProjectType } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { api } from "@/trpc/react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+
+const colorByType = {
+  [ProjectType.NONPROFIT]: "bg-blue-500",
+  [ProjectType.FORPROFIT]: "bg-green-500",
+  [ProjectType.IMPACT]: "bg-red-500",
+};
 
 type Props = {
   id: number;
   name: string;
   description: string;
   rolesNeeded: Roles[];
+  type: ProjectType[];
   collaborators: User[];
 };
 
@@ -23,6 +30,7 @@ export function ProjectCard({
   name,
   description,
   rolesNeeded,
+  type,
   collaborators,
 }: Props) {
   const t = useTranslations();
@@ -54,6 +62,16 @@ export function ProjectCard({
       className="relative w-full overflow-hidden rounded-3xl rounded-br-none bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-900 dark:to-neutral-950"
     >
       <Grid size={20} />
+      <div>
+        {type?.map((type) => (
+          <Badge
+            key={type}
+            className={`mb-2 me-2 last:me-0 ${colorByType[type]}`}
+          >
+            {t(type)}
+          </Badge>
+        ))}
+      </div>
       <h2 className="relative z-20 truncate text-2xl font-bold text-neutral-800 dark:text-white">
         {name}
       </h2>

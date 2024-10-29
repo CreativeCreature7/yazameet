@@ -1,5 +1,6 @@
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -70,8 +71,9 @@ model Project {
     createdBy   User   @relation(fields: [createdById], references: [id])
     createdById String
 
-    collaborators User[]  @relation(name: "ProjectCollaborators")
+    collaborators User[]        @relation(name: "ProjectCollaborators")
     rolesNeeded   Roles[]
+    type          ProjectType[]
 
     @@index([name])
 }
@@ -104,10 +106,17 @@ enum Year {
     FIRSTYEAR
     SECONDYEAR
     THIRDYEAR
+    FOURTHYEAR
 }
 
 enum MediaType {
     IMAGE
     VIDEO
     AUDIO
+}
+
+enum ProjectType {
+    NONPROFIT
+    FORPROFIT
+    IMPACT
 }

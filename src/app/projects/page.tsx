@@ -2,14 +2,11 @@ import { ProjectForm } from "@/app/_components/project-form";
 import { getServerAuthSession } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
 import Projects from "@/app/_components/projects";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";
-import { PlusIcon } from "lucide-react";
 
 export default async function ProjectsList() {
-  const t = await getTranslations();
-  const session = await getServerAuthSession();
+  await getTranslations();
+  await getServerAuthSession();
 
   void api.project.infiniteProjects.prefetchInfinite({
     limit: 5,
