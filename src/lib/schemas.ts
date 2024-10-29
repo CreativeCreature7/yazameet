@@ -1,9 +1,15 @@
 import { z } from "zod";
-import { Roles } from "@prisma/client";
+import { Roles, ProjectType } from "@prisma/client";
 
 export const optionRolesSchema = z.object({
   label: z.string(),
   value: z.nativeEnum(Roles),
+  disable: z.boolean().optional(),
+});
+
+export const optionProjectTypeSchema = z.object({
+  label: z.string(),
+  value: z.nativeEnum(ProjectType),
   disable: z.boolean().optional(),
 });
 

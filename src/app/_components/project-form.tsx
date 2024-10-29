@@ -9,14 +9,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import MultiSelect, { Option } from "@/components/ui/multi-select";
-import { Roles } from "@prisma/client";
+import { Roles, ProjectType } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { AutosizeTextarea } from "@/components/ui/autosize-textarea";
-import { optionRolesSchema } from "@/lib/schemas";
+import { optionRolesSchema, optionProjectTypeSchema } from "@/lib/schemas";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,7 @@ const BaseSchema = (t: (arg: string) => string) =>
     name: z.string().min(1),
     description: z.string().min(1),
     rolesNeeded: z.array(optionRolesSchema).min(1),
+    type: z.array(optionProjectTypeSchema).min(1),
   });
 
 export function ProjectForm() {
@@ -41,16 +42,24 @@ export function ProjectForm() {
     name: "",
     description: "",
     rolesNeeded: [],
+    type: [],
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
 
-  const OPTIONS: Option[] = Object.values(Roles).map((value) => ({
+  const OPTIONS_ROLES: Option[] = Object.values(Roles).map((value) => ({
     label: t(value),
     value,
   }));
+
+  const OPTIONS_PROJECT_TYPE: Option[] = Object.values(ProjectType).map(
+    (value) => ({
+      label: t(value),
+      value,
+    }),
+  );
 
   const utils = api.useUtils();
   const { mutate: createProject, isPending } = api.project.create.useMutation({
@@ -66,6 +75,7 @@ export function ProjectForm() {
     const updatedValues = {
       ...values,
       rolesNeeded: values.rolesNeeded.map((role) => role.value),
+      type: values.type.map((type) => type.value),
     };
     createProject(updatedValues);
   }
@@ -131,8 +141,30 @@ export function ProjectForm() {
                     <FormControl>
                       <MultiSelect
                         {...field}
-                        defaultOptions={OPTIONS}
+                        defaultOptions={OPTIONS_ROLES}
                         placeholder={t("select_your_roles")}
+                        emptyIndicator={
+                          <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                            {t("no_results")}
+                          </p>
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem className="block w-full">
+                    <FormLabel>{t("what_type_of_project_is_this")}</FormLabel>
+                    <FormControl>
+                      <MultiSelect
+                        {...field}
+                        defaultOptions={OPTIONS_PROJECT_TYPE}
+                        placeholder={t("select_your_project_type")}
                         emptyIndicator={
                           <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                             {t("no_results")}

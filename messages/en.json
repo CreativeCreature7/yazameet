@@ -40,6 +40,7 @@
     "FIRSTYEAR": "1st year",
     "SECONDYEAR": "2nd year",
     "THIRDYEAR": "3rd year",
+    "FOURTHYEAR": "4th year",
     "no_results": "No Results",
     "png_jpg_or_gif":"PNG, JPG or GIF",
     "or_drag_and_drop": "or drag and drop",
@@ -64,5 +65,13 @@
     "read_more": "Read More...",
     "email_sent_to": "Email sent to",
     "projects": "Projects",
-    "project_added_successfully": "Project added successfully"
+    "project_added_successfully": "Project added successfully",
+    "search_projects": "Search projects...",
+    "what_type_of_project_is_this": "What type of project is this?",
+    "select_your_project_type": "Select your project type",
+    "NONPROFIT": "Nonprofit",
+    "FORPROFIT": "For Profit",
+    "IMPACT": "Impact",
+    "filter_by_project_type": "Filter by project type",
+    "filter_by_roles_needed": "Filter by roles needed"
 }
