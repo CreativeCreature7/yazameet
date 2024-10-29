@@ -8,11 +8,11 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { Header } from "@/components/header";
-
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ClientDirectionProvider } from "@/components/client-direction-provider";
 import ClientSessionProvider from "@/components/client-session-proivder";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 
 export const metadata: Metadata = {
   title: "Yazameet",
@@ -51,6 +51,7 @@ export default async function RootLayout({
                 <ClientDirectionProvider dir={dir}>
                   <Header />
                   {children}
+                  <WhatsAppButton phoneNumber="+972547662015" />
                 </ClientDirectionProvider>
               </ClientSessionProvider>
             </ThemeProvider>

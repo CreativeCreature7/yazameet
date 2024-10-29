@@ -73,5 +73,7 @@
     "FORPROFIT": "עסקי",
     "IMPACT": "אימפקט",
     "filter_by_project_type": "סוג פרוייקט",
-    "filter_by_roles_needed": "תפקידים דרושים"
+    "filter_by_roles_needed": "תפקידים דרושים",
+    "contact_via_whatsapp": "צור קשר דרך וואטסאפ",
+    "whatsapp_default_message": "שלום! יש לי שאלה/הצעה לגבי מרכז היזמויות."
 }
