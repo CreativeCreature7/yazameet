@@ -73,5 +73,7 @@
     "FORPROFIT": "For Profit",
     "IMPACT": "Impact",
     "filter_by_project_type": "Filter by project type",
-    "filter_by_roles_needed": "Filter by roles needed"
+    "filter_by_roles_needed": "Filter by roles needed",
+    "contact_via_whatsapp": "Contact via WhatsApp",
+    "whatsapp_default_message": "Hello! I have a question/suggestion about the Entrepreneurship Hub."
 }
