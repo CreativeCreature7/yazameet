@@ -276,6 +276,29 @@ const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedSearchTerm, groupBy, open, triggerSearchOnFocus]);
 
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+        const commandList = document.querySelector('[cmdk-list]');
+        const multiSelect = inputRef.current?.closest('[cmdk-root]');
+        
+        if (!commandList || !multiSelect) return;
+        
+        const target = event.target as Node;
+        if (!multiSelect.contains(target) && !commandList.contains(target)) {
+          setOpen(false);
+          mouseOn.current = false;
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('touchstart', handleClickOutside);
+      };
+    }, []);
+
     const CreatableItem = () => {
       if (!creatable) return undefined;
       if (
