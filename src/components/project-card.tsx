@@ -56,6 +56,8 @@ export function ProjectCard({
     setEllipsisActive(!!isEllipsisActive());
   }, [descriptionRef.current]);
 
+  console.log(rolesNeeded);
+
   return (
     <div
       key={id}
