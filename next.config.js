@@ -17,6 +17,12 @@ const config = {
       {
         hostname: "yazameet.s3.eu-central-1.amazonaws.com",
       },
+      {
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        hostname: "cdn.discordapp.com",
+      },
     ],
   },
 };

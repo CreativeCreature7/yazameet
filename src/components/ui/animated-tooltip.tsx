@@ -110,8 +110,8 @@ export const AnimatedTooltip = ({
             onMouseMove={handleMouseMove}
             height={100}
             width={100}
-            src={item.image as string}
-            alt={item.name as string}
+            src={item.image ?? ""}
+            alt={item.name ?? ""}
             className={cn(tooltipVariants({ size }))}
           />
         </div>
