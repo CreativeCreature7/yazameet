@@ -1,4 +1,3 @@
-// src/app/_components/filter-dialog.tsx
 "use client";
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -46,7 +45,7 @@ export function FilterDialog({
           <SlidersHorizontal className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <div className="grid gap-4 py-4">
           <div className="flex flex-col gap-2">
             <MultiSelect
