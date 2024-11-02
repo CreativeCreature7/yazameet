@@ -42,6 +42,11 @@ export const userRouter = createTRPCRouter({
         year: true,
         image: true,
       },
+      where: {
+        image: {
+          not: null,
+        },
+      },
     });
   }),
 });

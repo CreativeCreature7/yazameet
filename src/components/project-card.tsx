@@ -11,9 +11,9 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
 const colorByType = {
-  [ProjectType.NONPROFIT]: "bg-blue-500",
-  [ProjectType.FORPROFIT]: "bg-green-500",
-  [ProjectType.IMPACT]: "bg-red-500",
+  [ProjectType.NONPROFIT]: "bg-blue-500 hover:bg-blue-600",
+  [ProjectType.FORPROFIT]: "bg-green-500 hover:bg-green-600",
+  [ProjectType.IMPACT]: "bg-red-500 hover:bg-red-600",
 };
 
 type Props = {
