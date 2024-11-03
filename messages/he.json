@@ -76,5 +76,8 @@
     "filter_by_project_type": "סוג פרוייקט",
     "filter_by_roles_needed": "תפקידים דרושים",
     "contact_via_whatsapp": "צור קשר דרך וואטסאפ",
-    "whatsapp_default_message": "שלום! יש לי שאלה/הצעה לגבי מרכז היזמויות."
+    "whatsapp_default_message": "שלום! יש לי שאלה/הצעה לגבי מרכז היזמויות.",
+    "update_your_profile": "עדכן פרטי פרופיל",
+    "save_changes": "שמור שינויים",
+    "profile_updated_successfully": "פרופיל עודכן בהצלחה"
 }

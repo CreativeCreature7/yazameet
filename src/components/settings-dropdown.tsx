@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function SettingsDropdown() {
-  const { data, update } = useSession();
+  const { data } = useSession();
   const t = useTranslations();
   const router = useRouter();
 
@@ -34,15 +34,23 @@ export function SettingsDropdown() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
           <Avatar>
-            <AvatarImage src={data?.user.image!} alt={data?.user.name!} />
+            <AvatarImage
+              className="object-cover"
+              src={data?.user.image!}
+              alt={data?.user.name!}
+            />
             <AvatarFallback>{data?.user.name}</AvatarFallback>
           </Avatar>
           <span className="sr-only">{t("settings")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => router.push("/settings")}>
+          <span className="text-red-">{t("settings")}</span>
+          <Settings className="ms-auto h-5" />
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleSignOut()}>
-          <span className="text-red-">{t("logout")}</span>
+          <span>{t("logout")}</span>
           <LogOut className="ms-auto h-5 text-red-700 rtl:rotate-180" />
         </DropdownMenuItem>
       </DropdownMenuContent>
