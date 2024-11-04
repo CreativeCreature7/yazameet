@@ -15,18 +15,31 @@ export const projectRouter = createTRPCRouter({
         description: z.string().min(1),
         rolesNeeded: z.array(z.nativeEnum(Roles)),
         type: z.array(z.nativeEnum(ProjectType)),
+        id: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.project.create({
-        data: {
-          name: input.name,
-          description: input.description,
-          rolesNeeded: input.rolesNeeded,
-          type: input.type,
-          createdBy: { connect: { id: ctx.session.user.id } },
-        },
-      });
+      if (input.id) {
+        return ctx.db.project.update({
+          where: { id: input.id },
+          data: {
+            name: input.name,
+            description: input.description,
+            rolesNeeded: input.rolesNeeded,
+            type: input.type,
+          },
+        });
+      } else {
+        return ctx.db.project.create({
+          data: {
+            name: input.name,
+            description: input.description,
+            rolesNeeded: input.rolesNeeded,
+            type: input.type,
+            createdBy: { connect: { id: ctx.session.user.id } },
+          },
+        });
+      }
     }),
 
   infiniteProjects: publicProcedure
@@ -63,7 +76,7 @@ export const projectRouter = createTRPCRouter({
                     mode: "insensitive",
                   },
                 },
-              ],  
+              ],
             },
             input.types && input.types.length > 0
               ? { type: { hasSome: input.types } }
@@ -136,5 +149,13 @@ export const projectRouter = createTRPCRouter({
       });
 
       return project;
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.project.delete({
+        where: { id: input.id },
+      });
     }),
 });

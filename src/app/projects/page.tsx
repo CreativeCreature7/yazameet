@@ -5,7 +5,7 @@ import Projects from "@/app/_components/projects";
 import { getTranslations } from "next-intl/server";
 
 export default async function ProjectsList() {
-  await getTranslations();
+  const t = await getTranslations();
   await getServerAuthSession();
 
   void api.project.infiniteProjects.prefetchInfinite({
@@ -15,7 +15,7 @@ export default async function ProjectsList() {
   return (
     <HydrateClient>
       <main className="flex h-full flex-col items-start justify-start">
-        <div className="mb-4 w-full rounded-3xl border border-neutral-200 bg-white p-3 shadow-xl shadow-black/[0.1] dark:border-white/[0.1] dark:bg-black dark:shadow-white/[0.05]">
+        <div className="mb-4 flex w-full items-center gap-4 rounded-3xl border border-neutral-200 bg-white p-3 shadow-xl shadow-black/[0.1] dark:border-white/[0.1] dark:bg-black dark:shadow-white/[0.05]">
           <ProjectForm />
         </div>
         <Projects />
