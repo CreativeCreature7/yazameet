@@ -79,5 +79,10 @@
     "whatsapp_default_message": "Hello! I have a question/suggestion about the Entrepreneurship Hub.",
     "update_your_profile": "Update your profile details",
     "save_changes": "Save Changes",
-    "profile_updated_successfully": "Profile updated successfully"
+    "profile_updated_successfully": "Profile updated successfully",
+    "my_projects": "My Projects",
+    "save_edit": "Save Edit",
+    "project_updated_successfully": "Project updated successfully",
+    "confirm_delete_project": "Are you sure you want to delete this project?",
+    "project_deleted_successfully": "Project deleted successfully"
 }

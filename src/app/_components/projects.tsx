@@ -11,6 +11,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { Option } from "@/components/ui/multi-select";
 import { ProjectType, Roles } from "@prisma/client";
 import { FilterDialog } from "@/app/_components/filter-dialog";
+import { useSession } from "next-auth/react";
 
 const Projects = () => {
   const t = useTranslations();
@@ -18,7 +19,7 @@ const Projects = () => {
   const [selectedTypes, setSelectedTypes] = useState<Option[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<Option[]>([]);
   const debouncedSearch = useDebounce(searchQuery, 700);
-
+  const { data: session } = useSession();
   const [latestProjects, latestProjectsQuery] =
     api.project.infiniteProjects.useSuspenseInfiniteQuery(
       {
@@ -68,6 +69,7 @@ const Projects = () => {
                   rolesNeeded={project.rolesNeeded}
                   type={project.type}
                   collaborators={project.collaborators}
+                  isOwner={project.createdById === session?.user.id}
                 />
               ))}
             </React.Fragment>

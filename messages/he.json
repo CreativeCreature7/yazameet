@@ -79,5 +79,10 @@
     "whatsapp_default_message": "שלום! יש לי שאלה/הצעה לגבי מרכז היזמויות.",
     "update_your_profile": "עדכן פרטי פרופיל",
     "save_changes": "שמור שינויים",
-    "profile_updated_successfully": "פרופיל עודכן בהצלחה"
+    "profile_updated_successfully": "פרופיל עודכן בהצלחה",
+    "my_projects": "הפרוייקטים שלי",
+    "save_edit": "שמור שינויים",
+    "project_updated_successfully": "פרוייקט עודכן בהצלחה",
+    "confirm_delete_project": "האם אתם בטוחים שברצונכם למחוק פרוייקט זה?",
+    "project_deleted_successfully": "פרוייקט נמחק בהצלחה"
 }

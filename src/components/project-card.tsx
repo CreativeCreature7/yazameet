@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { api } from "@/trpc/react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { ProjectForm } from "@/app/_components/project-form";
 
 const colorByType = {
   [ProjectType.NONPROFIT]: "bg-blue-500 hover:bg-blue-600",
@@ -23,6 +24,7 @@ type Props = {
   rolesNeeded: Roles[];
   type: ProjectType[];
   collaborators: User[];
+  isOwner: boolean;
 };
 
 export function ProjectCard({
@@ -32,6 +34,7 @@ export function ProjectCard({
   rolesNeeded,
   type,
   collaborators,
+  isOwner,
 }: Props) {
   const t = useTranslations();
   const utils = api.useUtils();
@@ -56,61 +59,78 @@ export function ProjectCard({
     setEllipsisActive(!!isEllipsisActive());
   }, [descriptionRef.current]);
 
-  console.log(rolesNeeded);
-
   return (
     <div
       key={id}
       className="relative w-full overflow-hidden rounded-3xl rounded-br-none bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-900 dark:to-neutral-950"
     >
       <Grid size={20} />
-      <div>
-        {type?.map((type) => (
-          <Badge
-            key={type}
-            className={`mb-2 me-2 last:me-0 ${colorByType[type]}`}
-          >
-            {t(type)}
-          </Badge>
-        ))}
-      </div>
-      <h2 className="relative z-20 truncate text-2xl font-bold text-neutral-800 dark:text-white">
-        {name}
-      </h2>
-      <div>
-        {rolesNeeded?.map((role) => (
-          <Badge key={role} className="mb-2 me-2 last:me-0">
-            {t(role)}
-          </Badge>
-        ))}
-      </div>
-      <p
-        ref={descriptionRef}
-        className={`relative z-20 ${ellipsisActive && "mb-0"} ${readMore ? "line-clamp-none" : "line-clamp-3"} text-base font-normal text-neutral-600 dark:text-neutral-400`}
-      >
-        {description}
-      </p>
-      {ellipsisActive && !readMore && (
-        <Button
-          className="p-0"
-          variant="linkHover2"
-          onClick={() => setReadMore(!readMore)}
+      <div className="flex flex-col justify-between">
+        <div>
+          {type?.map((type) => (
+            <Badge
+              key={type}
+              className={`mb-2 me-2 last:me-0 ${colorByType[type]}`}
+            >
+              {t(type)}
+            </Badge>
+          ))}
+        </div>
+        <h2 className="relative z-20 truncate text-2xl font-bold text-neutral-800 dark:text-white">
+          {name}
+        </h2>
+        <div>
+          {rolesNeeded?.map((role) => (
+            <Badge key={role} className="mb-2 me-2 last:me-0">
+              {t(role)}
+            </Badge>
+          ))}
+        </div>
+        <p
+          ref={descriptionRef}
+          className={`relative z-20 ${ellipsisActive && "mb-0"} ${readMore ? "line-clamp-none" : "line-clamp-3"} text-base font-normal text-neutral-600 dark:text-neutral-400`}
         >
-          {t("read_more")}
-        </Button>
-      )}
-      <div className="mt-4 flex flex-row justify-between">
-        <div className="flex flex-row">
-          <AnimatedTooltip
-            items={collaborators}
-            size="sm"
-            onPlusClick={() => addCollaborator({ id })}
-            shouldShowPlusClick={
-              !collaborators.some(
-                (collaborator) => collaborator.id === session.data?.user.id,
-              )
-            }
-          />
+          {description}
+        </p>
+        {ellipsisActive && !readMore && (
+          <Button
+            className="p-0"
+            variant="linkHover2"
+            onClick={() => setReadMore(!readMore)}
+          >
+            {t("read_more")}
+          </Button>
+        )}
+        <div className="mt-4 flex flex-row justify-between">
+          <div className="flex flex-row">
+            <AnimatedTooltip
+              items={collaborators}
+              size="sm"
+              onPlusClick={() => addCollaborator({ id })}
+              shouldShowPlusClick={
+                !collaborators.some(
+                  (collaborator) => collaborator.id === session.data?.user.id,
+                )
+              }
+            />
+          </div>
+          {isOwner && (
+            <ProjectForm
+              id={id}
+              values={{
+                name,
+                description,
+                rolesNeeded: rolesNeeded.map((role) => ({
+                  label: t(role),
+                  value: role,
+                })),
+                type: type.map((type) => ({
+                  label: t(type),
+                  value: type,
+                })),
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

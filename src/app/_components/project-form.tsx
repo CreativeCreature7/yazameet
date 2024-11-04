@@ -20,7 +20,7 @@ import { optionRolesSchema, optionProjectTypeSchema } from "@/lib/schemas";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
@@ -33,7 +33,12 @@ const BaseSchema = (t: (arg: string) => string) =>
     type: z.array(optionProjectTypeSchema).min(1),
   });
 
-export function ProjectForm() {
+type props = {
+  values?: z.infer<ReturnType<typeof BaseSchema>>;
+  id?: number;
+};
+
+export function ProjectForm({ values, id }: props) {
   const t = useTranslations();
   const session = useSession();
   const [openDialog, setOpenDialog] = useState(false);
@@ -46,7 +51,7 @@ export function ProjectForm() {
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: values ?? defaultValues,
   });
 
   const OPTIONS_ROLES: Option[] = Object.values(Roles).map((value) => ({
@@ -66,31 +71,58 @@ export function ProjectForm() {
     onSuccess: async () => {
       await utils.project.invalidate();
       form.reset();
+      values = undefined;
       setOpenDialog(false);
-      toast.success(t("project_added_successfully"));
+      id
+        ? toast.success(t("project_updated_successfully"))
+        : toast.success(t("project_added_successfully"));
     },
   });
+
+  const { mutate: deleteProject } = api.project.delete.useMutation({
+    onSuccess: async () => {
+      await utils.project.invalidate();
+      setOpenDialog(false);
+      toast.success(t("project_deleted_successfully"));
+    },
+  });
+
+  const handleDelete = () => {
+    if (!id) return;
+    if (window.confirm(t("confirm_delete_project"))) {
+      deleteProject({ id });
+    }
+  };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const updatedValues = {
       ...values,
       rolesNeeded: values.rolesNeeded.map((role) => role.value),
       type: values.type.map((type) => type.value),
+      id,
     };
     createProject(updatedValues);
   }
 
+  console.log(!!id);
+
   return (
     <Dialog open={openDialog} onOpenChange={() => setOpenDialog(!openDialog)}>
       <DialogTrigger asChild>
-        <Button
-          variant="expandIcon"
-          iconPlacement="right"
-          Icon={PlusIcon}
-          disabled={!session?.data?.user}
-        >
-          {t("add_new_project")}
-        </Button>
+        {!id ? (
+          <Button
+            variant="expandIcon"
+            iconPlacement="right"
+            Icon={PlusIcon}
+            disabled={!session?.data?.user}
+          >
+            {t("add_new_project")}
+          </Button>
+        ) : (
+          <Button variant="ringHover" className="rounded-full p-2">
+            <PencilIcon className="h-6 w-6" />
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="hidden-scrollbar overflow-y-scroll">
         <div className="w-full">
@@ -176,13 +208,24 @@ export function ProjectForm() {
                   </FormItem>
                 )}
               />
-              <LoadingButton
-                type="submit"
-                className="w-full"
-                loading={isPending}
-              >
-                {t("add")}
-              </LoadingButton>
+              <div className="flex gap-2">
+                <LoadingButton
+                  type="submit"
+                  className="w-full"
+                  loading={isPending}
+                >
+                  {id ? t("save_edit") : t("add")}
+                </LoadingButton>
+                {id && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDelete}
+                  >
+                    <TrashIcon />
+                  </Button>
+                )}
+              </div>
             </form>
           </FormProvider>
         </div>
