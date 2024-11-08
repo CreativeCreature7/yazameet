@@ -84,5 +84,8 @@
     "save_edit": "Save Edit",
     "project_updated_successfully": "Project updated successfully",
     "confirm_delete_project": "Are you sure you want to delete this project?",
-    "project_deleted_successfully": "Project deleted successfully"
+    "project_deleted_successfully": "Project deleted successfully",
+    "pending_collaboration_requests": "Pending Collaboration Requests",
+    "request_updated_successfully": "Request updated successfully",
+    "collaboration_request_sent": "Collaboration request sent"
 }

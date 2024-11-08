@@ -10,6 +10,7 @@ import { api } from "@/trpc/react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { ProjectForm } from "@/app/_components/project-form";
+import { toast } from "sonner";
 
 const colorByType = {
   [ProjectType.NONPROFIT]: "bg-blue-500 hover:bg-blue-600",
@@ -42,11 +43,19 @@ export function ProjectCard({
   const [readMore, setReadMore] = useState(false);
   const [ellipsisActive, setEllipsisActive] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement | null>(null);
-  const { mutate: addCollaborator } = api.project.addCollaborator.useMutation({
-    onSuccess: async () => {
-      await utils.project.infiniteProjects.invalidate();
-    },
-  });
+
+  const { mutate: requestCollaboration } =
+    api.project.requestCollaboration.useMutation({
+      onSuccess: () => {
+        utils.project.getRequestStatus.invalidate();
+        toast.success(t("collaboration_request_sent"));
+      },
+    });
+
+  const { data: requestStatus } = api.project.getRequestStatus.useQuery(
+    { projectId: id },
+    { enabled: !!session.data?.user },
+  );
 
   const isEllipsisActive = () => {
     return (
@@ -106,11 +115,15 @@ export function ProjectCard({
             <AnimatedTooltip
               items={collaborators}
               size="sm"
-              onPlusClick={() => addCollaborator({ id })}
+              onPlusClick={() => requestCollaboration({ id })}
               shouldShowPlusClick={
                 !collaborators.some(
                   (collaborator) => collaborator.id === session.data?.user.id,
-                )
+                ) && requestStatus?.status !== "PENDING"
+              }
+              pendingRequest={
+                requestStatus?.status === "PENDING" &&
+                requestStatus.userId === session.data?.user.id
               }
             />
           </div>

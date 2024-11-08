@@ -40,6 +40,7 @@ const config = {
       },
     ],
     "@typescript-eslint/require-await": "off",
+    "react/no-unescaped-entities": "off",
     "@typescript-eslint/no-misused-promises": [
       "error",
       {
