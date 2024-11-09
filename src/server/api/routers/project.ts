@@ -48,7 +48,7 @@ export const projectRouter = createTRPCRouter({
             name: Event_NEW_PROJECT,
             data: {
               roles: input.rolesNeeded,
-              url: `${process.env.VERCEL_URL}/projects/`,
+              url: `https://yazameet.vercel.app/projects/`,
             },
           });
         }
@@ -192,6 +192,11 @@ export const projectRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
+      await ctx.db.collaborationRequest.deleteMany({
+        where: { projectId: input.id },
+      });
+
+      // Then delete the project
       return ctx.db.project.delete({
         where: { id: input.id },
       });
@@ -220,7 +225,7 @@ export const projectRouter = createTRPCRouter({
           react: NewRequestEmail({
             projectName: project.name,
             requesterName: ctx.session.user.name!,
-            requestUrl: `${process.env.VERCEL_URL}/request/${project.id}`,
+            requestUrl: `https://yazameet.vercel.app/request/${project.id}`,
           }),
         });
       }
