@@ -48,7 +48,7 @@ export const projectRouter = createTRPCRouter({
             name: Event_NEW_PROJECT,
             data: {
               roles: input.rolesNeeded,
-              url: `${process.env.NEXTAUTH_URL}/projects/`,
+              url: `${process.env.VERCEL_URL}/projects/`,
             },
           });
         }
@@ -220,7 +220,7 @@ export const projectRouter = createTRPCRouter({
           react: NewRequestEmail({
             projectName: project.name,
             requesterName: ctx.session.user.name!,
-            requestUrl: `${process.env.NEXTAUTH_URL}/request/${project.id}`,
+            requestUrl: `${process.env.VERCEL_URL}/request/${project.id}`,
           }),
         });
       }
