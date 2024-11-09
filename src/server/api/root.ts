@@ -1,6 +1,7 @@
 import { projectRouter } from "@/server/api/routers/project";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { userRouter } from "@/server/api/routers/user";
+import { profileRouter } from "@/server/api/routers/profile";
 import { mediaRouter } from "@/server/api/routers/media";
 
 /**
@@ -11,6 +12,7 @@ import { mediaRouter } from "@/server/api/routers/media";
 export const appRouter = createTRPCRouter({
   project: projectRouter,
   user: userRouter,
+  profile: profileRouter,
   media: mediaRouter,
 });
 

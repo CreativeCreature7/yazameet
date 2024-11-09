@@ -84,5 +84,8 @@
     "save_edit": "שמור שינויים",
     "project_updated_successfully": "פרוייקט עודכן בהצלחה",
     "confirm_delete_project": "האם אתם בטוחים שברצונכם למחוק פרוייקט זה?",
-    "project_deleted_successfully": "פרוייקט נמחק בהצלחה"
+    "project_deleted_successfully": "פרוייקט נמחק בהצלחה",
+    "pending_collaboration_requests": "הצעות שיתוף פעולה",
+    "request_updated_successfully": "הצעת שיתוף פעולה עודכנה בהצלחה",
+    "collaboration_request_sent": "הצעת שיתוף פעולה נשלחה"
 }

@@ -11,8 +11,9 @@ import {
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { Clock, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 const tooltipVariants = cva(
   "relative !m-0 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105",
@@ -39,6 +40,7 @@ type Props = {
   size?: "default" | "sm";
   onPlusClick?: () => void;
   shouldShowPlusClick?: boolean;
+  pendingRequest?: boolean;
 };
 
 export const AnimatedTooltip = ({
@@ -46,6 +48,7 @@ export const AnimatedTooltip = ({
   size,
   onPlusClick,
   shouldShowPlusClick,
+  pendingRequest,
 }: Props) => {
   const t = useTranslations();
   const [hoveredIndex, setHoveredIndex] = useState<string | null>(null);
@@ -99,9 +102,11 @@ export const AnimatedTooltip = ({
               >
                 <div className="absolute inset-x-10 -bottom-px z-30 h-px w-[20%] bg-gradient-to-r from-transparent via-red-500 to-transparent" />
                 <div className="absolute -bottom-px left-10 z-30 h-px w-[40%] bg-gradient-to-r from-transparent via-rose-500 to-transparent" />
-                <div className="relative z-30 text-base font-bold text-white">
-                  {item.name}
-                </div>
+                <Link href={`/profile/${item.id}`}>
+                  <div className="relative z-30 text-base font-bold text-white hover:underline">
+                    {item.name}
+                  </div>
+                </Link>
                 <div className="text-xs text-white">{t(item.year)}</div>
               </motion.div>
             )}
@@ -127,6 +132,13 @@ export const AnimatedTooltip = ({
         >
           <PlusIcon className={cn(size)} />
         </Button>
+      )}
+      {pendingRequest && (
+        <div className={`${cn(tooltipVariants({ size }))} bg-accent`}>
+          <div className="flex h-full w-full items-center justify-center animate-pulse">
+            <Clock className={cn(size)} />
+          </div>
+        </div>
       )}
     </>
   );

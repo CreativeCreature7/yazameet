@@ -6,6 +6,10 @@ import {
   publicProcedure,
 } from "@/server/api/trpc";
 import { ProjectType, Roles } from "@prisma/client";
+import { sendEmail } from "@/lib/email";
+import NewRequestEmail from "@/components/emails/new-request";
+import { inngest } from "@/lib/inngest";
+import { Event_NEW_PROJECT } from "@/inngest/functions";
 
 export const projectRouter = createTRPCRouter({
   create: protectedProcedure
@@ -30,7 +34,7 @@ export const projectRouter = createTRPCRouter({
           },
         });
       } else {
-        return ctx.db.project.create({
+        const project = await ctx.db.project.create({
           data: {
             name: input.name,
             description: input.description,
@@ -39,6 +43,16 @@ export const projectRouter = createTRPCRouter({
             createdBy: { connect: { id: ctx.session.user.id } },
           },
         });
+        if (process.env.NODE_ENV === "production") {
+          inngest.send({
+            name: Event_NEW_PROJECT,
+            data: {
+              roles: input.rolesNeeded,
+              url: `${process.env.VERCEL_URL}/projects/`,
+            },
+          });
+        }
+        return project;
       }
     }),
 
@@ -117,8 +131,32 @@ export const projectRouter = createTRPCRouter({
           id,
         },
         include: {
-          collaborators: true,
-          createdBy: true,
+          collaborators: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          CollaborationRequest: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                  email: true,
+                },
+              },
+            },
+          },
         },
       });
       if (!project) return null;
@@ -157,5 +195,84 @@ export const projectRouter = createTRPCRouter({
       return ctx.db.project.delete({
         where: { id: input.id },
       });
+    }),
+  requestCollaboration: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const project = await ctx.db.project.findUnique({
+        where: { id: input.id },
+        include: { createdBy: true },
+      });
+
+      if (!project) throw new Error("Project not found");
+
+      await ctx.db.collaborationRequest.create({
+        data: {
+          projectId: input.id,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      if (process.env.NODE_ENV === "production") {
+        await sendEmail({
+          to: project.createdBy.email!,
+          subject: "New Collaboration Request",
+          react: NewRequestEmail({
+            projectName: project.name,
+            requesterName: ctx.session.user.name!,
+            requestUrl: `${process.env.VERCEL_URL}/request/${project.id}`,
+          }),
+        });
+      }
+
+      return { success: true };
+    }),
+  getRequestStatus: publicProcedure
+    .input(z.object({ projectId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.collaborationRequest.findFirst({
+        where: { projectId: input.projectId, userId: ctx.session?.user.id },
+      });
+    }),
+  updateRequest: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        status: z.enum(["APPROVED", "REJECTED"]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const request = await ctx.db.collaborationRequest.findUnique({
+        where: { id: input.id },
+        include: { project: true },
+      });
+
+      if (!request) {
+        throw new Error("Request not found");
+      }
+
+      // Check if user is project owner
+      if (request.project.createdById !== ctx.session.user.id) {
+        throw new Error("Unauthorized");
+      }
+
+      const updatedRequest = await ctx.db.collaborationRequest.update({
+        where: { id: input.id },
+        data: { status: input.status },
+      });
+
+      // If approved, add user as collaborator
+      if (input.status === "APPROVED") {
+        await ctx.db.project.update({
+          where: { id: request.projectId },
+          data: {
+            collaborators: {
+              connect: { id: request.userId },
+            },
+          },
+        });
+      }
+
+      return updatedRequest;
     }),
 });
