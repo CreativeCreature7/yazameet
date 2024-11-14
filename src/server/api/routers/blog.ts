@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { env } from "@/env";
 import { Prisma } from "@prisma/client";
@@ -70,14 +70,14 @@ export const blogRouter = createTRPCRouter({
     });
   }),
 
-  getPublished: protectedProcedure.query(async ({ ctx }) => {
+  getPublished: publicProcedure.query(async ({ ctx }) => {
     return ctx.db.blogPost.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
     });
   }),
 
-  getBySlug: protectedProcedure
+  getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ ctx, input }) => {
       return ctx.db.blogPost.findUnique({ where: { slug: input.slug } });
