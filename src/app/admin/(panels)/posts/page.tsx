@@ -32,8 +32,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import ImageResize from 'tiptap-extension-resize-image';
-
+import ImageResize from "tiptap-extension-resize-image";
+import Youtube from "@tiptap/extension-youtube";
+import { Youtube as YoutubeIcon } from "lucide-react";
 
 export default function AdminPosts() {
   const [title, setTitle] = useState("");
@@ -51,6 +52,14 @@ export default function AdminPosts() {
       BulletList,
       OrderedList,
       ListItem,
+      Youtube.configure({
+        controls: true,
+        nocookie: true,
+        modestBranding: true,
+        HTMLAttributes: {
+          class: "w-full aspect-video",
+        },
+      }),
     ],
     content: "",
     editorProps: {
@@ -361,6 +370,28 @@ export default function AdminPosts() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Add Image</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const url = prompt("Enter YouTube URL");
+                    if (url) {
+                      editor?.commands.setYoutubeVideo({
+                        src: url,
+                      });
+                    }
+                  }}
+                >
+                  <YoutubeIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Add YouTube Video</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
