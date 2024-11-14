@@ -87,5 +87,9 @@
     "project_deleted_successfully": "פרוייקט נמחק בהצלחה",
     "pending_collaboration_requests": "הצעות שיתוף פעולה",
     "request_updated_successfully": "הצעת שיתוף פעולה עודכנה בהצלחה",
-    "collaboration_request_sent": "הצעת שיתוף פעולה נשלחה"
+    "collaboration_request_sent": "הצעת שיתוף פעולה נשלחה",
+    "blog": "בלוג",
+    "Blog": {
+        "backToBlog": "חזרה לבלוג"
+    }
 }

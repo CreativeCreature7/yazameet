@@ -1,5 +1,4 @@
 import "@/styles/globals.css";
-
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { Arimo as FontSans } from "next/font/google";
@@ -7,12 +6,10 @@ import { cn } from "@/lib/utils";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { Header } from "@/components/header";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ClientDirectionProvider } from "@/components/client-direction-provider";
 import ClientSessionProvider from "@/components/client-session-proivder";
-import { WhatsAppButton } from "@/components/whatsapp-button";
 
 export const metadata: Metadata = {
   title: "Yazameet",
@@ -49,15 +46,13 @@ export default async function RootLayout({
             >
               <ClientSessionProvider>
                 <ClientDirectionProvider dir={dir}>
-                  <Header />
                   {children}
-                  <WhatsAppButton phoneNumber="+972547662015" />
+                  <Toaster />
                 </ClientDirectionProvider>
               </ClientSessionProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
         </TRPCReactProvider>
-        <Toaster />
       </body>
     </html>
   );

@@ -116,7 +116,7 @@ export default function Settings() {
       "image/gif": [".gif"],
     },
     maxFiles: 1,
-    maxSize: 1024 * 1024, // 1MB
+    maxSize: 4 * 1024 * 1024,
     multiple: true,
   };
 

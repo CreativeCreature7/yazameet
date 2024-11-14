@@ -13,7 +13,7 @@ export const optionProjectTypeSchema = z.object({
   disable: z.boolean().optional(),
 });
 
-export const PROFILE_MAX_FILE_SIZE = 1 * 1024 * 1024;
+export const PROFILE_MAX_FILE_SIZE = 4 * 1024 * 1024;
 
 export const profilePictureSchema = z
   .array(

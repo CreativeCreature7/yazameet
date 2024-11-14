@@ -14,7 +14,7 @@ export function Header() {
   const { status } = useSession();
 
   return (
-    <div className="fixed top-0 grid w-full grid-cols-12">
+    <div className="fixed top-0 z-50 grid w-full grid-cols-12 bg-background shadow-xl">
       <div className="col-span-6 ms-6 flex flex-row items-center gap-2 lg:col-span-3 lg:ms-10">
         {status === "authenticated" && <SettingsDropdown />}
         <ThemeToggle />
