@@ -10,6 +10,7 @@ import { sendEmail } from "@/lib/email";
 import NewRequestEmail from "@/components/emails/new-request";
 import { inngest } from "@/lib/inngest";
 import { Event_NEW_PROJECT } from "@/inngest/functions";
+import NewRequestStatusEmail from "@/components/emails/new-request-status";
 
 export const projectRouter = createTRPCRouter({
   create: protectedProcedure
@@ -49,6 +50,7 @@ export const projectRouter = createTRPCRouter({
             data: {
               roles: input.rolesNeeded,
               url: `https://yazameet.vercel.app/projects/`,
+              userEmail: ctx.session.user.email,
             },
           });
         }
@@ -249,7 +251,10 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const request = await ctx.db.collaborationRequest.findUnique({
         where: { id: input.id },
-        include: { project: true },
+        include: {
+          project: true,
+          user: true,
+        },
       });
 
       if (!request) {
@@ -275,6 +280,18 @@ export const projectRouter = createTRPCRouter({
               connect: { id: request.userId },
             },
           },
+        });
+      }
+
+      // Send email notification if in production
+      if (process.env.NODE_ENV === "production") {
+        await sendEmail({
+          to: request.user.email!,
+          subject: `Collaboration Request ${input.status.toLowerCase()}`,
+          react: NewRequestStatusEmail({
+            projectName: request.project.name,
+            status: input.status,
+          }),
         });
       }
 

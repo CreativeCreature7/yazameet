@@ -14,6 +14,9 @@ export const sendNewProjectEmails = inngest.createFunction(
         roles: {
           hasSome: event.data.roles,
         },
+        email: {
+          not: event.data.userEmail,
+        },
       },
     });
 
