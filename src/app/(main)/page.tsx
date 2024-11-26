@@ -4,13 +4,13 @@ import { FlipWords } from "@/components/ui/flip-words";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { getServerSession } from "next-auth";
+import { getServerAuthSession } from "@/server/auth";
 import { api } from "@/trpc/server";
 import LatestUsers from "@/app/_components/latest-users";
 
 export default async function Home() {
   const t = await getTranslations();
-  const session = await getServerSession();
+  const session = await getServerAuthSession();
 
   void api.user.getLatestUsers.prefetch();
 
