@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Clock, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const tooltipVariants = cva(
   "relative !m-0 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105",
@@ -50,6 +51,7 @@ export const AnimatedTooltip = ({
   shouldShowPlusClick,
   pendingRequest,
 }: Props) => {
+  const session = useSession();
   const t = useTranslations();
   const [hoveredIndex, setHoveredIndex] = useState<string | null>(null);
   const springConfig = { stiffness: 100, damping: 5 };
@@ -102,11 +104,17 @@ export const AnimatedTooltip = ({
               >
                 <div className="absolute inset-x-10 -bottom-px z-30 h-px w-[20%] bg-gradient-to-r from-transparent via-red-500 to-transparent" />
                 <div className="absolute -bottom-px left-10 z-30 h-px w-[40%] bg-gradient-to-r from-transparent via-rose-500 to-transparent" />
-                <Link href={`/profile/${item.id}`}>
-                  <div className="relative z-30 text-base font-bold text-white hover:underline">
+                {session.data?.user ? (
+                  <Link href={`/profile/${item.id}`}>
+                    <div className="relative z-30 text-base font-bold text-white hover:underline">
+                      {item.name}
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="relative z-30 text-base font-bold text-white">
                     {item.name}
                   </div>
-                </Link>
+                )}
                 <div className="text-xs text-white">{t(item.year)}</div>
               </motion.div>
             )}
@@ -135,7 +143,7 @@ export const AnimatedTooltip = ({
       )}
       {pendingRequest && (
         <div className={`${cn(tooltipVariants({ size }))} bg-accent`}>
-          <div className="flex h-full w-full items-center justify-center animate-pulse">
+          <div className="flex h-full w-full animate-pulse items-center justify-center">
             <Clock className={cn(size)} />
           </div>
         </div>
