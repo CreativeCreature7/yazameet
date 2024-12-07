@@ -48,8 +48,9 @@ import {
 import { api } from "@/trpc/react";
 import { DropzoneOptions } from "react-dropzone";
 import { LoadingButton } from "@/components/ui/loading-button";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useParams } from "next/navigation";
 
 const FileSvgDraw = () => {
   const t = useTranslations();
@@ -118,36 +119,52 @@ export default function SignUp() {
     multiple: true,
   };
 
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
+
   const { mutate: addDetails } = api.user.addDetails.useMutation();
   const { mutateAsync: getPresignedUrl } =
     api.media.getPresignedUrl.useMutation();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    const file = values.profilePicture[0]!;
-    const { uploadURL } = await getPresignedUrl({
-      fileName: file.name,
-      fileType: file.type,
-    });
+    let profilePictureUrl = "";
 
-    const { status } = await fetch(uploadURL, {
-      method: "PUT",
-      body: file,
-      headers: {
-        "Content-type": file.type,
-      },
-    });
+    if (values.profilePicture?.[0]) {
+      const file = values.profilePicture[0];
+      const { uploadURL } = await getPresignedUrl({
+        fileName: file.name,
+        fileType: file.type,
+      });
 
-    if (status === 200) {
-      const updatedValues = {
-        ...values,
-        profilePicture: uploadURL.split("?")[0]!,
-        roles: values.roles.map((role) => role.value),
-      };
-      addDetails(updatedValues);
-      router.replace("/projects");
-      updateSession();
+      const { status } = await fetch(uploadURL, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-type": file.type,
+        },
+      });
+
+      if (status === 200) {
+        profilePictureUrl = uploadURL.split("?")[0] ?? "";
+      }
     }
+
+    const updatedValues = profilePictureUrl
+      ? {
+          ...values,
+          profilePicture: profilePictureUrl ?? undefined,
+          roles: values.roles.map((role) => role.value),
+        }
+      : {
+          ...values,
+          profilePicture: undefined,
+          roles: values.roles.map((role) => role.value),
+        };
+
+    addDetails(updatedValues);
+    router.replace(callbackUrl ?? "/projects");
+    updateSession();
     setIsLoading(false);
   }
 
@@ -250,7 +267,7 @@ export default function SignUp() {
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <FileUploader
-                          value={field.value}
+                          value={field.value ?? []}
                           onValueChange={field.onChange}
                           dropzoneOptions={dropZoneConfig}
                           reSelect={true}

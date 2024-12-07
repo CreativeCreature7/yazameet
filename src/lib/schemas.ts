@@ -21,9 +21,7 @@ export const profilePictureSchema = z
       message: "File size must be less than 1MB",
     }),
   )
-  .min(1, {
-    message: "profile picture is required",
-  })
   .max(1, {
     message: "Maximum 1 files is allowed",
-  });
+  })
+  .optional();

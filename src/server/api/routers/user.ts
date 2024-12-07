@@ -12,10 +12,10 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         fullName: z.string().min(1),
-        profilePicture: z.string().min(1),
+        profilePicture: z.string().max(1).optional(),
         year: z.nativeEnum(Year),
         roles: z.array(z.nativeEnum(Roles)).min(1),
-      }),
+      }).partial(),
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.user.update({

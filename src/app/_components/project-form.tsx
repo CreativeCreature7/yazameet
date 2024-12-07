@@ -36,9 +36,10 @@ const BaseSchema = (t: (arg: string) => string) =>
 type props = {
   values?: z.infer<ReturnType<typeof BaseSchema>>;
   id?: number;
+  defaultType?: ProjectType;
 };
 
-export function ProjectForm({ values, id }: props) {
+export function ProjectForm({ values, id, defaultType }: props) {
   const t = useTranslations();
   const session = useSession();
   const [openDialog, setOpenDialog] = useState(false);
@@ -47,7 +48,7 @@ export function ProjectForm({ values, id }: props) {
     name: "",
     description: "",
     rolesNeeded: [],
-    type: [],
+    type: defaultType ? [{ label: t(defaultType), value: defaultType }] : [],
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,12 +60,13 @@ export function ProjectForm({ values, id }: props) {
     value,
   }));
 
-  const OPTIONS_PROJECT_TYPE: Option[] = Object.values(ProjectType).map(
-    (value) => ({
+  const OPTIONS_PROJECT_TYPE: Option[] = Object.values(ProjectType)
+    .filter((type) => !defaultType || type === defaultType)
+    .map((value) => ({
       label: t(value),
       value,
-    }),
-  );
+      disable: defaultType ? value !== defaultType : false,
+    }));
 
   const utils = api.useUtils();
   const { mutate: createProject, isPending } = api.project.create.useMutation({
@@ -103,8 +105,6 @@ export function ProjectForm({ values, id }: props) {
     };
     createProject(updatedValues);
   }
-
-  console.log(!!id);
 
   return (
     <Dialog open={openDialog} onOpenChange={() => setOpenDialog(!openDialog)}>
@@ -186,43 +186,46 @@ export function ProjectForm({ values, id }: props) {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem className="block w-full">
-                    <FormLabel>{t("what_type_of_project_is_this")}</FormLabel>
-                    <FormControl>
-                      <MultiSelect
-                        {...field}
-                        defaultOptions={OPTIONS_PROJECT_TYPE}
-                        placeholder={t("select_your_project_type")}
-                        emptyIndicator={
-                          <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                            {t("no_results")}
-                          </p>
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="flex gap-2">
+              {!defaultType && (
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem className="block w-full">
+                      <FormLabel>{t("what_type_of_project_is_this")}</FormLabel>
+                      <FormControl>
+                        <MultiSelect
+                          {...field}
+                          defaultOptions={OPTIONS_PROJECT_TYPE}
+                          placeholder={t("select_your_project_type")}
+                          emptyIndicator={
+                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                              {t("no_results")}
+                            </p>
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              <div className="mt-4 flex justify-between">
                 <LoadingButton
                   type="submit"
-                  className="w-full"
                   loading={isPending}
+                  className="w-full"
                 >
-                  {id ? t("save_edit") : t("add")}
+                  {id ? t("update_project") : t("add_new_project")}
                 </LoadingButton>
                 {id && (
                   <Button
                     type="button"
                     variant="destructive"
+                    className="ms-2"
                     onClick={handleDelete}
                   >
-                    <TrashIcon />
+                    <TrashIcon className="h-4 w-4" />
                   </Button>
                 )}
               </div>
