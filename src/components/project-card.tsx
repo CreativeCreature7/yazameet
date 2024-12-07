@@ -13,10 +13,14 @@ import { ProjectForm } from "@/app/_components/project-form";
 import { toast } from "sonner";
 
 const colorByType = {
-  [ProjectType.NONPROFIT]: "bg-blue-500 hover:bg-blue-600",
-  [ProjectType.FORPROFIT]: "bg-green-500 hover:bg-green-600",
-  [ProjectType.IMPACT]: "bg-red-500 hover:bg-red-600",
-};
+  NONPROFIT: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+  FORPROFIT:
+    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+  IMPACT:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+  UPRISE:
+    "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
+} as const;
 
 type Props = {
   id: number;
@@ -51,6 +55,14 @@ export function ProjectCard({
         toast.success(t("collaboration_request_sent"));
       },
     });
+
+  const handleRequestCollaboration = () => {
+    if (!session.data?.user) {
+      // open login modal
+    } else {
+      requestCollaboration({ id });
+    }
+  };
 
   const { data: requestStatus } = api.project.getRequestStatus.useQuery(
     { projectId: id },
@@ -115,7 +127,7 @@ export function ProjectCard({
             <AnimatedTooltip
               items={collaborators}
               size="sm"
-              onPlusClick={() => requestCollaboration({ id })}
+              onPlusClick={handleRequestCollaboration}
               shouldShowPlusClick={
                 !collaborators.some(
                   (collaborator) => collaborator.id === session.data?.user.id,

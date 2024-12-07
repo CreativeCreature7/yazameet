@@ -73,6 +73,7 @@
     "NONPROFIT": "Nonprofit",
     "FORPROFIT": "For Profit",
     "IMPACT": "Impact",
+    "UPRISE": "Up-Rise",
     "filter_by_project_type": "Filter by project type",
     "filter_by_roles_needed": "Filter by roles needed",
     "contact_via_whatsapp": "Contact via WhatsApp",
@@ -91,5 +92,8 @@
     "blog": "Blog",
     "Blog": {
         "backToBlog": "Back to Blog"
-    }
+    },
+    "filter": "Filter",
+    "update_project": "Update Project",
+    "login_to_add_project": "Login to see Projects from Up-Rise"
 }

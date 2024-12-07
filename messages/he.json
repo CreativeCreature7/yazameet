@@ -73,6 +73,7 @@
     "NONPROFIT": "ללא מטרות רווח",
     "FORPROFIT": "עסקי",
     "IMPACT": "אימפקט",
+    "UPRISE": "Up-Rise",
     "filter_by_project_type": "סוג פרוייקט",
     "filter_by_roles_needed": "תפקידים דרושים",
     "contact_via_whatsapp": "צור קשר דרך וואטסאפ",
@@ -91,5 +92,10 @@
     "blog": "בלוג",
     "Blog": {
         "backToBlog": "חזרה לבלוג"
-    }
+    },
+    "filter": "סינון",
+    "project_type": "סוג פרוייקט",
+    "roles": "תפקידים",
+    "update_project": "עידכון פרוייקט",
+    "login_to_add_project": "הכנסו כדאי לראות ולהתחבר לפרוייקטים מ Up-Rise"
 }
