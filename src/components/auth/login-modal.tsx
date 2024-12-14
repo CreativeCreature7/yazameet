@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { LoadingButton } from "@/components/ui/loading-button";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -18,11 +19,14 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [email, setEmail] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [showResendSuccess, setShowResendSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     await signIn("email", { email, redirect: false });
     setIsEmailSent(true);
+    setIsLoading(false);
   };
 
   const handleResendEmail = async () => {
@@ -141,9 +145,14 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <Button type="submit" className="w-full">
+            <LoadingButton
+              type="submit"
+              className="w-full"
+              loading={isLoading}
+              disabled={isLoading}
+            >
               {t("next")}
-            </Button>
+            </LoadingButton>
           </form>
         </div>
       </DialogContent>
