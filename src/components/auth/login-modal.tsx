@@ -42,7 +42,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <div className="flex flex-col gap-4 py-6">
             <Button
               variant="ghost"
-              className="absolute top-4 flex h-auto w-auto gap-2 p-0 text-muted-foreground ltr:left-4 rtl:right-4"
+              className="absolute top-4 -m-1 flex h-auto w-auto gap-2 p-1 text-muted-foreground ltr:left-4 rtl:right-4"
               onClick={() => setIsEmailSent(false)}
             >
               <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
