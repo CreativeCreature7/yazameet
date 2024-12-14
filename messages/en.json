@@ -95,6 +95,7 @@
     },
     "filter": "Filter",
     "update_project": "Update Project",
+    "project_type": "Project Type",
     "login_to_add_project": "Login to see Projects from Up-Rise",
     "auth": {
         "createAccountOrLogin": "Create an account or log in",

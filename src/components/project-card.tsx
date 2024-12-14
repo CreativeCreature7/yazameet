@@ -83,7 +83,7 @@ export function ProjectCard({
   return (
     <div
       key={id}
-      className="relative w-full overflow-hidden rounded-3xl rounded-br-none bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-900 dark:to-neutral-950"
+      className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-b from-neutral-100 to-white p-6 dark:from-neutral-900 dark:to-neutral-950"
     >
       <Grid size={20} />
       <div className="flex flex-col justify-between">

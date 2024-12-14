@@ -32,7 +32,11 @@ export function SettingsDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button
+          variant="outline"
+          size="icon"
+          className="border-none hover:bg-transparent"
+        >
           <Avatar>
             <AvatarImage
               className="object-cover"

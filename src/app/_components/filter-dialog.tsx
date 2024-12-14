@@ -12,7 +12,7 @@ import { Filter } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Option } from "@/components/ui/multi-select";
 import { ProjectType, Roles } from "@prisma/client";
-import { Badge } from "@/components/ui/badge";
+import { TagSelect } from "@/components/ui/tag-select";
 
 type Props = {
   selectedTypes?: Option[];
@@ -49,7 +49,7 @@ export function FilterDialog({
         <Button
           variant="outline"
           size="icon"
-          className="absolute top-1/2 -translate-y-1/2 transform border-none bg-transparent ltr:right-3 rtl:left-3 hover:bg-transparent"
+          className="absolute top-1/2 -translate-y-1/2 transform border-none bg-transparent hover:bg-transparent ltr:right-3 rtl:left-3"
         >
           <Filter className="h-4 w-4" />
         </Button>
@@ -62,74 +62,30 @@ export function FilterDialog({
           {!hideTypeFilter && selectedTypes && setSelectedTypes && (
             <div>
               <h4 className="mb-2 text-sm font-medium">{t("project_type")}</h4>
-              <div className="flex flex-wrap gap-2">
-                {OPTIONS_PROJECT_TYPE.map((type) => (
-                  <Badge
-                    key={type.value}
-                    variant={
-                      selectedTypes.some(
-                        (selectedType) => selectedType.value === type.value,
-                      )
-                        ? "default"
-                        : "outline"
-                    }
-                    className="cursor-pointer"
-                    onClick={() => {
-                      if (
-                        selectedTypes.some(
-                          (selectedType) => selectedType.value === type.value,
-                        )
-                      ) {
-                        setSelectedTypes(
-                          selectedTypes.filter(
-                            (selectedType) => selectedType.value !== type.value,
-                          ),
-                        );
-                      } else {
-                        setSelectedTypes([...selectedTypes, type]);
-                      }
-                    }}
-                  >
-                    {type.label}
-                  </Badge>
-                ))}
-              </div>
+              <TagSelect
+                options={OPTIONS_PROJECT_TYPE.map(o => o.value as string)}
+                selectedOptions={selectedTypes.map(o => o.value as string)}
+                onChange={(values) => {
+                  const newSelected = values.map(value => 
+                    OPTIONS_PROJECT_TYPE.find(o => o.value === value)!
+                  );
+                  setSelectedTypes(newSelected);
+                }}
+              />
             </div>
           )}
           <div>
             <h4 className="mb-2 text-sm font-medium">{t("roles")}</h4>
-            <div className="flex flex-wrap gap-2">
-              {OPTIONS_ROLES.map((role) => (
-                <Badge
-                  key={role.value}
-                  variant={
-                    selectedRoles.some(
-                      (selectedRole) => selectedRole.value === role.value,
-                    )
-                      ? "default"
-                      : "outline"
-                  }
-                  className="cursor-pointer"
-                  onClick={() => {
-                    if (
-                      selectedRoles.some(
-                        (selectedRole) => selectedRole.value === role.value,
-                      )
-                    ) {
-                      setSelectedRoles(
-                        selectedRoles.filter(
-                          (selectedRole) => selectedRole.value !== role.value,
-                        ),
-                      );
-                    } else {
-                      setSelectedRoles([...selectedRoles, role]);
-                    }
-                  }}
-                >
-                  {role.label}
-                </Badge>
-              ))}
-            </div>
+            <TagSelect
+              options={OPTIONS_ROLES.map(o => o.value as string)}
+              selectedOptions={selectedRoles.map(o => o.value as string)}
+              onChange={(values) => {
+                const newSelected = values.map(value => 
+                  OPTIONS_ROLES.find(o => o.value === value)!
+                );
+                setSelectedRoles(newSelected);
+              }}
+            />
           </div>
         </div>
       </DialogContent>

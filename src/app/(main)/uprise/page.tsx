@@ -29,7 +29,7 @@ export default async function UpriseProjectsList() {
             className="object-contain"
           />
         </div>
-        <div className="mb-4 flex w-full items-center gap-4 rounded-3xl border border-neutral-200 bg-white p-3 shadow-xl shadow-black/[0.1] dark:border-white/[0.1] dark:bg-black dark:shadow-white/[0.05]">
+        <div className="mb-4">
           <ProjectForm defaultType="UPRISE" />
         </div>
         <Projects />

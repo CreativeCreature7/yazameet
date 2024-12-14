@@ -169,160 +169,162 @@ export default function SignUp() {
   }
 
   return (
-    <Card className="fixed left-1/2 top-1/2 mx-auto w-[calc(100%_-_40px)] max-w-sm -translate-x-1/2 -translate-y-1/2 lg:w-full">
-      <CardHeader>
-        <CardTitle className="text-2xl">{t("profile_details")}</CardTitle>
-        <CardDescription>{t("in_order_to_continue")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="relative grid w-full gap-2"
-              >
-                <div className="grid grid-cols-2 gap-4">
+    <div className="flex h-screen w-full items-center justify-center">
+      <Card className="mt-16 max-w-sm xl:mt-40">
+        <CardHeader>
+          <CardTitle className="text-2xl">{t("profile_details")}</CardTitle>
+          <CardDescription>{t("in_order_to_continue")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="relative grid w-full gap-2"
+                >
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="fullName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("full_name")}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t("tyler_durden")} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="year"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("year")}</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t("select_year")} />
+                              </SelectTrigger>
+                            </FormControl>
+                            {Year && (
+                              <SelectContent className="w-[180px]">
+                                <SelectItem value={Year.FIRSTYEAR}>
+                                  {t(Year.FIRSTYEAR)}
+                                </SelectItem>
+                                <SelectItem value={Year.SECONDYEAR}>
+                                  {t(Year.SECONDYEAR)}
+                                </SelectItem>
+                                <SelectItem value={Year.THIRDYEAR}>
+                                  {t(Year.THIRDYEAR)}
+                                </SelectItem>
+                                <SelectItem value={Year.FOURTHYEAR}>
+                                  {t(Year.FOURTHYEAR)}
+                                </SelectItem>
+                              </SelectContent>
+                            )}
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <FormField
                     control={form.control}
-                    name="fullName"
+                    name="roles"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("full_name")}</FormLabel>
+                        <FormLabel>{t("what_are_your_roles")}</FormLabel>
                         <FormControl>
-                          <Input placeholder={t("tyler_durden")} {...field} />
+                          <TagSelect
+                            options={Object.values(Roles)}
+                            selectedOptions={field.value.map(
+                              (role) => role.value,
+                            )}
+                            onChange={(selected) => {
+                              field.onChange(
+                                selected.map((value) => ({
+                                  value,
+                                  label: t(value),
+                                })),
+                              );
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="year"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("year")}</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t("select_year")} />
-                            </SelectTrigger>
-                          </FormControl>
-                          {Year && (
-                            <SelectContent className="w-[180px]">
-                              <SelectItem value={Year.FIRSTYEAR}>
-                                {t(Year.FIRSTYEAR)}
-                              </SelectItem>
-                              <SelectItem value={Year.SECONDYEAR}>
-                                {t(Year.SECONDYEAR)}
-                              </SelectItem>
-                              <SelectItem value={Year.THIRDYEAR}>
-                                {t(Year.THIRDYEAR)}
-                              </SelectItem>
-                              <SelectItem value={Year.FOURTHYEAR}>
-                                {t(Year.FOURTHYEAR)}
-                              </SelectItem>
-                            </SelectContent>
-                          )}
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="roles"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("what_are_your_roles")}</FormLabel>
-                      <FormControl>
-                        <TagSelect
-                          options={Object.values(Roles)}
-                          selectedOptions={field.value.map(
-                            (role) => role.value,
-                          )}
-                          onChange={(selected) => {
-                            field.onChange(
-                              selected.map((value) => ({
-                                value,
-                                label: t(value),
-                              })),
-                            );
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div
-                  className={`flex w-full flex-col items-start gap-4 rounded-md px-2 pb-1 ${
-                    form.watch("profilePicture") !== null ? "pt-4" : "pt-2"
-                  }`}
-                >
-                  <FormLabel>{t("profile_picture")}</FormLabel>
-                  <FormField
-                    control={form.control}
-                    name="profilePicture"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FileUploader
-                          value={field.value ?? []}
-                          onValueChange={field.onChange}
-                          dropzoneOptions={dropZoneConfig}
-                          reSelect={true}
-                          className="w-full"
-                        >
-                          <FileInput className="outline-dashed outline-1 outline-black dark:outline-white">
-                            <div className="flex w-full flex-col items-center justify-center pb-4 pt-3">
-                              <FileSvgDraw />
-                            </div>
-                          </FileInput>
-                          {field.value && field.value.length > 0 && (
-                            <FileUploaderContent className="w-full flex-row justify-center gap-2 rounded-b-none rounded-t-md p-2">
-                              {field.value.map((file, i) => (
-                                <FileUploaderItem
-                                  key={i}
-                                  index={i}
-                                  aria-roledescription={`file ${i + 1} containing ${
-                                    file.name
-                                  }`}
-                                  className="size-20 p-0"
-                                >
-                                  <AspectRatio className="size-full">
-                                    <Image
-                                      src={URL.createObjectURL(file)}
-                                      alt={file.name}
-                                      className="rounded-full object-cover"
-                                      fill
-                                    />
-                                  </AspectRatio>
-                                </FileUploaderItem>
-                              ))}
-                            </FileUploaderContent>
-                          )}
-                        </FileUploader>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <LoadingButton
-                  type="submit"
-                  className="w-full"
-                  loading={isLoading}
-                >
-                  {t("join")}
-                </LoadingButton>
-              </form>
-            </Form>
+                  <div
+                    className={`flex w-full flex-col items-start gap-4 rounded-md px-2 pb-1 ${
+                      form.watch("profilePicture") !== null ? "pt-4" : "pt-2"
+                    }`}
+                  >
+                    <FormLabel>{t("profile_picture")}</FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="profilePicture"
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FileUploader
+                            value={field.value ?? []}
+                            onValueChange={field.onChange}
+                            dropzoneOptions={dropZoneConfig}
+                            reSelect={true}
+                            className="w-full"
+                          >
+                            <FileInput className="outline-dashed outline-1 outline-black dark:outline-white">
+                              <div className="flex w-full flex-col items-center justify-center pb-4 pt-3">
+                                <FileSvgDraw />
+                              </div>
+                            </FileInput>
+                            {field.value && field.value.length > 0 && (
+                              <FileUploaderContent className="w-full flex-row justify-center gap-2 rounded-b-none rounded-t-md p-2">
+                                {field.value.map((file, i) => (
+                                  <FileUploaderItem
+                                    key={i}
+                                    index={i}
+                                    aria-roledescription={`file ${i + 1} containing ${
+                                      file.name
+                                    }`}
+                                    className="size-20 p-0"
+                                  >
+                                    <AspectRatio className="size-full">
+                                      <Image
+                                        src={URL.createObjectURL(file)}
+                                        alt={file.name}
+                                        className="rounded-full object-cover"
+                                        fill
+                                      />
+                                    </AspectRatio>
+                                  </FileUploaderItem>
+                                ))}
+                              </FileUploaderContent>
+                            )}
+                          </FileUploader>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <LoadingButton
+                    type="submit"
+                    className="w-full"
+                    loading={isLoading}
+                  >
+                    {t("join")}
+                  </LoadingButton>
+                </form>
+              </Form>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -36,7 +36,7 @@ export function TagSelect<T extends string>({
           key={option}
           variant={selectedOptions.includes(option) ? "default" : "outline"}
           onClick={() => toggleOption(option)}
-          className="h-auto border py-1.5 transition-colors hover:text-accent-foreground"
+          className="h-auto border py-1.5 transition-colors"
           size="sm"
           type="button"
         >
