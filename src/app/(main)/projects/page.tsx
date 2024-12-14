@@ -15,7 +15,7 @@ export default async function ProjectsList() {
   return (
     <HydrateClient>
       <main className="flex h-full flex-col items-start justify-start">
-        <div className="my-4">
+        <div className="mt-8 mb-4">
           <ProjectForm />
         </div>
         <Projects />
