@@ -97,5 +97,20 @@
     "project_type": "סוג פרוייקט",
     "roles": "תפקידים",
     "update_project": "עידכון פרוייקט",
-    "login_to_add_project": "הכנסו כדאי לראות ולהתחבר לפרוייקטים מ Up-Rise"
+    "login_to_add_project": "הכנסו כדאי לראות ולהתחבר לפרוייקטים מ Up-Rise",
+    "auth": {
+        "createAccountOrLogin": "בואו נכנס ל-Yazameet",
+        "loginBelow": "התחברות או יצירת חשבון חדש",
+        "continueWithGoogle": "המשך עם Google",
+        "continueWithDiscord": "המשך עם Discord",
+        "orContinueWithEmail": "או המשך עם אימייל",
+        "back": "חזור",
+        "next": "המשך",
+        "checkInbox": "מעולה, יש לך מייל מאיתנו!",
+        "emailSentTo": "שלחנו קישור כניסה ל-{email}. אנא בדוק את תיקיית הספאם במקרה שלא קיבלת את האימייל.",
+        "openGmail": "פתח Gmail",
+        "resendEmail": "שלח שוב",
+        "emailSentSuccess": "האימייל נשלח!",
+        "emailPlaceholder": "כתובת מייל"
+    }
 }

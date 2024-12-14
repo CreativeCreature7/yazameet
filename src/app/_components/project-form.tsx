@@ -8,7 +8,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import MultiSelect, { Option } from "@/components/ui/multi-select";
+import { Option } from "@/components/ui/multi-select";
 import { Roles, ProjectType } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import { FormProvider, useForm } from "react-hook-form";
@@ -24,6 +24,7 @@ import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { TagSelect } from "@/components/ui/tag-select";
 
 const BaseSchema = (t: (arg: string) => string) =>
   z.object({
@@ -168,18 +169,20 @@ export function ProjectForm({ values, id, defaultType }: props) {
                 control={form.control}
                 name="rolesNeeded"
                 render={({ field }) => (
-                  <FormItem className="block w-full">
+                  <FormItem>
                     <FormLabel>{t("what_roles_do_you_need")}</FormLabel>
                     <FormControl>
-                      <MultiSelect
-                        {...field}
-                        defaultOptions={OPTIONS_ROLES}
-                        placeholder={t("select_your_roles")}
-                        emptyIndicator={
-                          <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                            {t("no_results")}
-                          </p>
-                        }
+                      <TagSelect
+                        options={Object.values(Roles)}
+                        selectedOptions={field.value.map((role) => role.value)}
+                        onChange={(selected) => {
+                          field.onChange(
+                            selected.map((value) => ({
+                              value,
+                              label: t(value),
+                            })),
+                          );
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -191,18 +194,27 @@ export function ProjectForm({ values, id, defaultType }: props) {
                   control={form.control}
                   name="type"
                   render={({ field }) => (
-                    <FormItem className="block w-full">
+                    <FormItem>
                       <FormLabel>{t("what_type_of_project_is_this")}</FormLabel>
                       <FormControl>
-                        <MultiSelect
-                          {...field}
-                          defaultOptions={OPTIONS_PROJECT_TYPE}
-                          placeholder={t("select_your_project_type")}
-                          emptyIndicator={
-                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                              {t("no_results")}
-                            </p>
-                          }
+                        <TagSelect
+                          options={Object.values(ProjectType).filter(
+                            (type) => !defaultType || type === defaultType,
+                          )}
+                          selectedOptions={field.value.map(
+                            (type) => type.value,
+                          )}
+                          onChange={(selected) => {
+                            field.onChange(
+                              selected.map((value) => ({
+                                value,
+                                label: t(value),
+                                disable: defaultType
+                                  ? value !== defaultType
+                                  : false,
+                              })),
+                            );
+                          }}
                         />
                       </FormControl>
                       <FormMessage />

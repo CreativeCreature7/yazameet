@@ -131,7 +131,9 @@ export function ProjectCard({
               shouldShowPlusClick={
                 !collaborators.some(
                   (collaborator) => collaborator.id === session.data?.user.id,
-                ) && requestStatus?.status !== "PENDING"
+                ) &&
+                requestStatus?.status !== "PENDING" &&
+                !!session.data?.user
               }
               pendingRequest={
                 requestStatus?.status === "PENDING" &&

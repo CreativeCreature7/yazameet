@@ -5,13 +5,12 @@ import Projects from "@/app/_components/uprise-projects";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import LogoUprise from "@/../public/Images/uprise_logo.png";
-import { LoginDialog } from "@/app/_components/login-dialog";
 import { getProviders } from "next-auth/react";
 
 export default async function UpriseProjectsList() {
-  const t = await getTranslations();
-  const session = await getServerAuthSession();
-  const providers = await getProviders();
+  void (await getTranslations());
+  void (await getServerAuthSession());
+  void (await getProviders());
 
   void api.project.infiniteProjects.prefetchInfinite({
     limit: 5,
@@ -20,9 +19,8 @@ export default async function UpriseProjectsList() {
 
   return (
     <HydrateClient>
-      <LoginDialog providers={providers} />
       <main className="flex h-full flex-col items-start justify-start">
-        <div className="mb-8 flex w-full items-center justify-center">
+        <div className="mb-8 flex w-full items-center justify-center xl:mt-8">
           <Image
             src={LogoUprise}
             alt="Up-Rise Logo"
