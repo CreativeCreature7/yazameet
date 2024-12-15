@@ -119,6 +119,13 @@ enum RequestStatus {
 }
 
 enum Roles {
+    CMO
+    CTO
+    COFOUNDER
+    CEO
+    CPO
+    CFO
+    COO
     DESIGNER
     PROJECTMANAGER
     DATAANALYST
