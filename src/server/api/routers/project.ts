@@ -8,6 +8,8 @@ import {
 import { ProjectType, Roles } from "@prisma/client";
 import { sendEmail } from "@/lib/email";
 import NewRequestEmail from "@/components/emails/new-request";
+import ApprovedRequestEmail from "@/components/emails/approved-request";
+import RejectedRequestEmail from "@/components/emails/rejected-request";
 import { inngest } from "@/lib/inngest";
 import { Event_NEW_PROJECT } from "@/inngest/functions";
 
@@ -267,7 +269,7 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const request = await ctx.db.collaborationRequest.findUnique({
         where: { id: input.id },
-        include: { project: true },
+        include: { project: true, user: true },
       });
 
       if (!request) {
@@ -294,6 +296,28 @@ export const projectRouter = createTRPCRouter({
             },
           },
         });
+        if (process.env.NODE_ENV === "production") {
+          await sendEmail({
+            to: request.user.email!,
+            subject: `Great News, ${request.project.name} 🎉 From Yazameet`,
+            react: ApprovedRequestEmail({
+              projectName: request.project.name,
+              requesterName: ctx.session.user.name!,
+            }),
+          });
+        }
+      }
+      if (input.status === "REJECTED") {
+        if (process.env.NODE_ENV === "production") {
+          await sendEmail({
+            to: request.user.email!,
+            subject: `Update on Your Request to: ${request.project.name}`,
+            react: RejectedRequestEmail({
+              projectName: request.project.name,
+              requesterName: ctx.session.user.name!,
+            }),
+          });
+        }
       }
 
       return updatedRequest;
