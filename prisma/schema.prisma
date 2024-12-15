@@ -150,4 +150,5 @@ enum ProjectType {
     NONPROFIT
     FORPROFIT
     IMPACT
+    UPRISE
 }

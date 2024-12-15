@@ -16,7 +16,7 @@ export default async function RequestPage({
   const session = await getServerAuthSession();
 
   if (!session) {
-    redirect("/auth/sign-in");
+    redirect("/");
   }
 
   const project = await api.project.getProject({

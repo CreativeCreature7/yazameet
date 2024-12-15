@@ -22,7 +22,8 @@ import {
   FileUploaderItem,
   FileInput,
 } from "@/components/ui/file-upload";
-import MultiSelect, { Option } from "@/components/ui/multi-select";
+import { Option } from "@/components/ui/multi-select";
+import { TagSelect } from "@/components/ui/tag-select";
 import { useTranslations } from "next-intl";
 import { Roles, Year } from "@prisma/client";
 import { z } from "zod";
@@ -221,18 +222,20 @@ export default function Settings() {
                 control={form.control}
                 name="roles"
                 render={({ field }) => (
-                  <FormItem className="block w-full">
+                  <FormItem>
                     <FormLabel>{t("what_are_your_roles")}</FormLabel>
                     <FormControl>
-                      <MultiSelect
-                        {...field}
-                        defaultOptions={OPTIONS}
-                        placeholder={t("select_your_roles")}
-                        emptyIndicator={
-                          <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                            {t("no_results")}
-                          </p>
-                        }
+                      <TagSelect
+                        options={Object.values(Roles)}
+                        selectedOptions={field.value?.map((role) => role.value) ?? []}
+                        onChange={(selected) => {
+                          field.onChange(
+                            selected.map((value) => ({
+                              value,
+                              label: t(value),
+                            }))
+                          );
+                        }}
                       />
                     </FormControl>
                     <FormMessage />

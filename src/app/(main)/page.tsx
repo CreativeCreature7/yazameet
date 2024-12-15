@@ -7,6 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { getServerAuthSession } from "@/server/auth";
 import { api } from "@/trpc/server";
 import LatestUsers from "@/app/_components/latest-users";
+import { SignInPageButton } from "@/components/sign-in-page-button";
 
 export default async function Home() {
   const t = await getTranslations();
@@ -37,31 +38,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
-      {!session?.user ? (
-        <Link href={"/auth/sign-in"}>
-          <Button
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"
-            variant="expandIcon"
-            iconPlacement="right"
-            Icon={ArrowRight}
-            size="lg"
-          >
-            {t("join")}
-          </Button>
-        </Link>
-      ) : (
-        <Link href={"/projects"}>
-          <Button
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 font-sans text-2xl"
-            variant="expandIcon"
-            iconPlacement="right"
-            Icon={ArrowRight}
-            size="lg"
-          >
-            {t("projects")}
-          </Button>
-        </Link>
-      )}
+      <SignInPageButton />
     </main>
   );
 }

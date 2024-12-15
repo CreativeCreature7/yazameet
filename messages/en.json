@@ -73,6 +73,7 @@
     "NONPROFIT": "Nonprofit",
     "FORPROFIT": "For Profit",
     "IMPACT": "Impact",
+    "UPRISE": "Up-Rise",
     "filter_by_project_type": "Filter by project type",
     "filter_by_roles_needed": "Filter by roles needed",
     "contact_via_whatsapp": "Contact via WhatsApp",
@@ -91,5 +92,24 @@
     "blog": "Blog",
     "Blog": {
         "backToBlog": "Back to Blog"
+    },
+    "filter": "Filter",
+    "update_project": "Update Project",
+    "project_type": "Project Type",
+    "login_to_add_project": "Login to see Projects from Up-Rise",
+    "auth": {
+        "createAccountOrLogin": "Create an account or log in",
+        "loginBelow": "Log in below or create a new account",
+        "continueWithGoogle": "Continue with Google",
+        "continueWithDiscord": "Continue with Discord",
+        "orContinueWithEmail": "or continue with email",
+        "back": "Back",
+        "next": "Next",
+        "checkInbox": "Great, check your inbox!",
+        "emailSentTo": "We've just sent a sign-in link to {email}. Please check your spam folder in case you didn't get the email.",
+        "openGmail": "Open Gmail",
+        "resendEmail": "Resend email",
+        "emailSentSuccess": "Email sent!",
+        "emailPlaceholder": "example@email.com"
     }
 }

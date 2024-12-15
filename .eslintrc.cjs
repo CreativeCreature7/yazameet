@@ -27,6 +27,7 @@ const config = {
     "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
     "@typescript-eslint/no-redundant-type-constituents": "off",
     "@typescript-eslint/prefer-optional-chain": "off",
+    "@typescript-eslint/no-unnecessary-type-assertion": "off",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
       {
