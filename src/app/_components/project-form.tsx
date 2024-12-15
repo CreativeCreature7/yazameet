@@ -56,37 +56,24 @@ export function ProjectForm({ values, id, defaultType }: props) {
     defaultValues: values ?? defaultValues,
   });
 
-  const OPTIONS_ROLES: Option[] = Object.values(Roles).map((value) => ({
-    label: t(value),
-    value,
-  }));
-
-  const OPTIONS_PROJECT_TYPE: Option[] = Object.values(ProjectType)
-    .filter((type) => !defaultType || type === defaultType)
-    .map((value) => ({
-      label: t(value),
-      value,
-      disable: defaultType ? value !== defaultType : false,
-    }));
-
   const utils = api.useUtils();
   const { mutate: createProject, isPending } = api.project.create.useMutation({
     onSuccess: async () => {
-      await utils.project.invalidate();
-      form.reset();
-      values = undefined;
       setOpenDialog(false);
       id
         ? toast.success(t("project_updated_successfully"))
         : toast.success(t("project_added_successfully"));
+      await utils.project.invalidate();
+      form.reset();
+      values = undefined;
     },
   });
 
   const { mutate: deleteProject } = api.project.delete.useMutation({
     onSuccess: async () => {
-      await utils.project.invalidate();
       setOpenDialog(false);
       toast.success(t("project_deleted_successfully"));
+      await utils.project.invalidate();
     },
   });
 

@@ -32,6 +32,13 @@ export const projectRouter = createTRPCRouter({
             rolesNeeded: input.rolesNeeded,
             type: input.type,
           },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            rolesNeeded: true,
+            type: true,
+          },
         });
       } else {
         const project = await ctx.db.project.create({
@@ -42,16 +49,27 @@ export const projectRouter = createTRPCRouter({
             type: input.type,
             createdBy: { connect: { id: ctx.session.user.id } },
           },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            rolesNeeded: true,
+            type: true,
+          },
         });
+
         if (process.env.NODE_ENV === "production") {
-          inngest.send({
-            name: Event_NEW_PROJECT,
-            data: {
-              roles: input.rolesNeeded,
-              url: `https://yazameet.vercel.app/projects/`,
-            },
-          });
+          void inngest
+            .send({
+              name: Event_NEW_PROJECT,
+              data: {
+                roles: input.rolesNeeded,
+                url: `https://yazameet.vercel.app/projects/`,
+              },
+            })
+            .catch(console.error);
         }
+
         return project;
       }
     }),
@@ -232,11 +250,11 @@ export const projectRouter = createTRPCRouter({
 
       return { success: true };
     }),
-  getRequestStatus: publicProcedure
+  getRequestStatus: protectedProcedure
     .input(z.object({ projectId: z.number() }))
     .query(async ({ ctx, input }) => {
       return ctx.db.collaborationRequest.findFirst({
-        where: { projectId: input.projectId, userId: ctx.session?.user.id },
+        where: { projectId: input.projectId, userId: ctx.session.user.id },
       });
     }),
   updateRequest: protectedProcedure
