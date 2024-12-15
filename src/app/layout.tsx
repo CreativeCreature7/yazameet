@@ -43,6 +43,7 @@ export default async function RootLayout({
               attribute="class"
               defaultTheme="light"
               disableTransitionOnChange
+              enableSystem={false}
             >
               <ClientSessionProvider>
                 <ClientDirectionProvider dir={dir}>
