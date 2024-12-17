@@ -12,6 +12,7 @@ import ApprovedRequestEmail from "@/components/emails/approved-request";
 import RejectedRequestEmail from "@/components/emails/rejected-request";
 import { inngest } from "@/lib/inngest";
 import { Event_NEW_PROJECT } from "@/inngest/functions";
+import { TRPCError } from "@trpc/server";
 
 export const projectRouter = createTRPCRouter({
   create: protectedProcedure
@@ -255,8 +256,13 @@ export const projectRouter = createTRPCRouter({
   getRequestStatus: protectedProcedure
     .input(z.object({ projectId: z.number() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.collaborationRequest.findFirst({
-        where: { projectId: input.projectId, userId: ctx.session.user.id },
+      return ctx.db.collaborationRequest.findUnique({
+        where: {
+          projectId_userId: {
+            projectId: input.projectId,
+            userId: ctx.session.user.id,
+          },
+        },
       });
     }),
   updateRequest: protectedProcedure
@@ -321,5 +327,157 @@ export const projectRouter = createTRPCRouter({
       }
 
       return updatedRequest;
+    }),
+  submitContactRequest: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        notes: z.string(),
+        purpose: z.string(),
+        roles: z.array(z.nativeEnum(Roles)),
+        cv: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { projectId, notes, purpose, roles, cv } = input;
+
+      // Check if project exists
+      const project = await ctx.db.project.findUnique({
+        where: { id: projectId },
+        include: {
+          createdBy: true,
+        },
+      });
+
+      if (!project) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Project not found",
+        });
+      }
+      const existingRequest = await ctx.db.contactRequest.findFirst({
+        where: {
+          projectId,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      if (existingRequest) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "You already have a pending request for this project",
+        });
+      }
+
+      // Create contact request
+      const contactRequest = await ctx.db.contactRequest.create({
+        data: {
+          notes,
+          purpose,
+          cvUrl: cv,
+          roles,
+          project: {
+            connect: { id: projectId },
+          },
+          user: {
+            connect: { id: ctx.session.user.id },
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      // Send email notification to project owner
+      await sendEmail({
+        to: project.createdBy.email!,
+        subject: `New Contact Request for ${project.name}`,
+        react: NewRequestEmail({
+          projectName: project.name,
+          requesterName: contactRequest.user.name!,
+          requestUrl: `/dashboard/projects/${projectId}/requests`,
+        }),
+      });
+
+      return contactRequest;
+    }),
+
+  getContactRequests: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { projectId } = input;
+
+      // Verify user is project owner
+      const project = await ctx.db.project.findUnique({
+        where: { id: projectId },
+      });
+
+      if (!project || project.createdById !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to view these requests",
+        });
+      }
+
+      return ctx.db.contactRequest.findMany({
+        where: {
+          projectId,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
+
+  updateContactRequestStatus: protectedProcedure
+    .input(
+      z.object({
+        requestId: z.number(),
+        status: z.enum(["APPROVED", "REJECTED"]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { requestId, status } = input;
+
+      const request = await ctx.db.contactRequest.findUnique({
+        where: { id: requestId },
+        include: {
+          project: true,
+        },
+      });
+
+      if (!request) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Request not found",
+        });
+      }
+
+      // Verify user is project owner
+      if (request.project.createdById !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to update this request",
+        });
+      }
+
+      return ctx.db.contactRequest.update({
+        where: { id: requestId },
+        data: { status },
+      });
     }),
 });

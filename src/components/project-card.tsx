@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { ProjectForm } from "@/app/_components/project-form";
 import { toast } from "sonner";
+import { ContactRequestDialog } from "@/components/contact-request-dialog";
 
 const colorByType = {
   NONPROFIT: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
@@ -141,7 +142,7 @@ export function ProjectCard({
               }
             />
           </div>
-          {isOwner && (
+          {isOwner ? (
             <ProjectForm
               id={id}
               values={{
@@ -157,6 +158,8 @@ export function ProjectCard({
                 })),
               }}
             />
+          ) : (
+            <ContactRequestDialog projectId={id} />
           )}
         </div>
       </div>

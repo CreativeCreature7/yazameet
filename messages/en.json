@@ -118,5 +118,18 @@
         "resendEmail": "Resend email",
         "emailSentSuccess": "Email sent!",
         "emailPlaceholder": "example@email.com"
-    }
+    },
+    "contact_project": "Contact Project",
+    "purpose_of_contact": "Purpose of Contact",
+    "purpose_placeholder": "Why are you interested in this project?",
+    "interested_roles": "Interested Roles",
+    "additional_notes": "Additional Notes",
+    "notes_placeholder": "Share more about your experience and how you can contribute...",
+    "upload_cv": "Upload CV",
+    "drag_drop_cv": "Drag and drop your CV here or click to browse",
+    "send_request": "Send Request",
+    "contact_request_sent": "Contact request sent successfully",
+    "error_uploading_file": "Error uploading file",
+    "file_too_large": "File too large. Maximum size is 5MB",
+    "invalid_file_type": "Invalid file type. Allowed types: PDF, DOC, DOCX"
 }

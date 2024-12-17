@@ -95,7 +95,7 @@
     "project_deleted_successfully": "פרוייקט נמחק בהצלחה",
     "pending_collaboration_requests": "הצעות שיתוף פעולה",
     "request_updated_successfully": "הצעת שיתוף פעולה עודכנה בהצלחה",
-    "collaboration_request_sent": "הצעת שיתוף פעולה נשלחה",
+    "collaboration_request_sent": "ה��עת שיתוף פעולה נשלחה",
     "blog": "בלוג",
     "Blog": {
         "backToBlog": "חזרה לבלוג"
@@ -119,5 +119,18 @@
         "resendEmail": "שלח שוב",
         "emailSentSuccess": "האימייל נשלח!",
         "emailPlaceholder": "כתובת מייל"
-    }
+    },
+    "contact_project": "צור קשר",
+    "purpose_of_contact": "מטרת הפנייה",
+    "purpose_placeholder": "למה את/ה מתעניין/ת בפרויקט זה?",
+    "interested_roles": "תפקידים מבוקשים",
+    "additional_notes": "הערות נוספות",
+    "notes_placeholder": "ספר/י עוד על הניסיון שלך ואיך את/ה יכול/ה לתרום...",
+    "upload_cv": "העלאת קורות חיים",
+    "drag_drop_cv": "גרור ושחרר קובץ כאן או לחץ לבחירה",
+    "send_request": "שלח בקשה",
+    "contact_request_sent": "בקשת הקשר נשלחה בהצלחה",
+    "error_uploading_file": "שגיאה בהעלאת הקובץ",
+    "file_too_large": "קובץ גדול מדי. גודל מקסימלי הוא 5MB",
+    "invalid_file_type": "סוג קובץ לא חוקי. סוגים מותרים: PDF, DOC, DOCX"
 }
