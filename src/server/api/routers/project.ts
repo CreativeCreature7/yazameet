@@ -395,7 +395,7 @@ export const projectRouter = createTRPCRouter({
         react: NewRequestEmail({
           projectName: project.name,
           requesterName: contactRequest.user.name!,
-          requestUrl: `/dashboard/projects/${projectId}/requests`,
+          requestUrl: `/dashboard/requests`,
         }),
       });
 
@@ -478,6 +478,64 @@ export const projectRouter = createTRPCRouter({
       return ctx.db.contactRequest.update({
         where: { id: requestId },
         data: { status },
+      });
+    }),
+
+  getMyProjects: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.project.findMany({
+      where: {
+        createdById: ctx.session.user.id,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+  }),
+
+  getAllContactRequests: protectedProcedure
+    .input(
+      z.object({
+        projectIds: z.array(z.number()),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { projectIds } = input;
+
+      // Verify user owns all projects
+      const projects = await ctx.db.project.findMany({
+        where: {
+          id: { in: projectIds },
+          createdById: ctx.session.user.id,
+        },
+        select: { id: true },
+      });
+
+      const authorizedProjectIds = projects.map((p) => p.id);
+
+      return ctx.db.contactRequest.findMany({
+        where: {
+          projectId: { in: authorizedProjectIds },
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+          project: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
       });
     }),
 });

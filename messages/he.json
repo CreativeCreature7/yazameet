@@ -95,7 +95,7 @@
     "project_deleted_successfully": "פרוייקט נמחק בהצלחה",
     "pending_collaboration_requests": "הצעות שיתוף פעולה",
     "request_updated_successfully": "הצעת שיתוף פעולה עודכנה בהצלחה",
-    "collaboration_request_sent": "ה��עת שיתוף פעולה נשלחה",
+    "collaboration_request_sent": "הצעת שיתוף פעולה נשלחה",
     "blog": "בלוג",
     "Blog": {
         "backToBlog": "חזרה לבלוג"
@@ -132,5 +132,13 @@
     "contact_request_sent": "בקשת הקשר נשלחה בהצלחה",
     "error_uploading_file": "שגיאה בהעלאת הקובץ",
     "file_too_large": "קובץ גדול מדי. גודל מקסימלי הוא 5MB",
-    "invalid_file_type": "סוג קובץ לא חוקי. סוגים מותרים: PDF, DOC, DOCX"
+    "invalid_file_type": "סוג קובץ לא חוקי. סוגים מותרים: PDF, DOC, DOCX",
+    "contact_requests": "בקשות יצירת קשר",
+    "no_requests": "אין בקשות יצירת קשר עדיין",
+    "download_cv": "הורד קורות חיים",
+    "approve": "אשר",
+    "reject": "דחה",
+    "PENDING": "ממתין",
+    "APPROVED": "אושר",
+    "REJECTED": "נדחה"
 }

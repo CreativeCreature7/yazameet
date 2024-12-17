@@ -131,5 +131,13 @@
     "contact_request_sent": "Contact request sent successfully",
     "error_uploading_file": "Error uploading file",
     "file_too_large": "File too large. Maximum size is 5MB",
-    "invalid_file_type": "Invalid file type. Allowed types: PDF, DOC, DOCX"
+    "invalid_file_type": "Invalid file type. Allowed types: PDF, DOC, DOCX",
+    "contact_requests": "Contact Requests",
+    "no_requests": "No contact requests yet",
+    "download_cv": "Download CV",
+    "approve": "Approve",
+    "reject": "Reject",
+    "PENDING": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected"
 }
