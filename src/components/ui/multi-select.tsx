@@ -477,7 +477,7 @@ const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                 {
                   "w-full": hidePlaceholderWhenSelected,
                   "px-3 py-2": selected.length === 0,
-                  "ml-1": selected.length !== 0,
+                  "me-1": selected.length !== 0,
                 },
                 inputProps?.className,
               )}

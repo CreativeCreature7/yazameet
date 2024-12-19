@@ -3,7 +3,7 @@
 import { api } from "@/trpc/react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import Image from "next/image";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Mail, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,14 +32,20 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
               transition={{ delay: 0.2 }}
               className="relative h-24 w-24 overflow-hidden rounded-full sm:h-32 sm:w-32"
             >
-              <Image
-                src={profile.image ?? "/default-avatar.png"}
-                alt={profile.name ?? ""}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 96px, 128px"
-                priority
-              />
+              <Avatar className="h-full w-full">
+                <AvatarImage
+                  src={profile.image ?? ""}
+                  alt={profile.name ?? ""}
+                  className="object-cover"
+                />
+                <AvatarFallback>
+                  {profile.name
+                    ?.split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
             </motion.div>
 
             <div className="text-center sm:text-start">
