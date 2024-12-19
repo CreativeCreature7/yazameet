@@ -13,9 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
-import { Download, CheckCircle, XCircle } from "lucide-react";
+import { Download, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-import { RequestStatus } from "@prisma/client";
 
 export default function RequestsPage() {
   const t = useTranslations();
@@ -30,25 +29,26 @@ export default function RequestsPage() {
     );
 
   const utils = api.useUtils();
-  const { mutate: updateStatus } =
-    api.project.updateContactRequestStatus.useMutation({
-      onSuccess: () => {
-        toast.success(t("request_updated_successfully"));
-        void utils.project.getAllContactRequests.invalidate();
-      },
-    });
+  const { mutate: addCollaborator } = api.project.addCollaborator.useMutation({
+    onSuccess: () => {
+      toast.success(t("collaborator_added_successfully"));
+      void utils.project.getAllContactRequests.invalidate();
+    },
+  });
 
-  const handleStatusUpdate = (
-    requestId: number,
-    status: Extract<RequestStatus, "APPROVED" | "REJECTED">,
-  ) => {
-    updateStatus({ requestId, status });
+  const handleAddCollaborator = (request: any) => {
+    addCollaborator({
+      id: request.project.id,
+      userId: request.user.id,
+      roles: request.roles,
+    });
   };
 
   const handleDownloadCV = (cvUrl: string, userName: string) => {
     const link = document.createElement("a");
     link.href = cvUrl;
     link.download = `${userName}_CV.pdf`;
+    link.target = "_blank"; // Open in new tab
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -56,7 +56,7 @@ export default function RequestsPage() {
 
   if (isLoadingProjects || isLoadingRequests) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-40">
         <Skeleton className="h-8 w-64" />
         <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
@@ -69,7 +69,7 @@ export default function RequestsPage() {
 
   if (!requests?.length) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-40">
         <h1 className="text-3xl font-bold">{t("contact_requests")}</h1>
         <p className="mt-4 text-muted-foreground">{t("no_requests")}</p>
       </div>
@@ -77,28 +77,20 @@ export default function RequestsPage() {
   }
 
   return (
-    <div className="container mx-auto py-40">
+    <div className="container py-16 md:py-40">
       <h1 className="text-3xl font-bold">{t("contact_requests")}</h1>
       <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {requests.map((request) => (
           <Card key={request.id}>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <div>
+                <div className="w-full">
+                  <CardDescription className="mb-2 text-center text-3xl font-medium text-foreground">
+                    {request.project.name}
+                  </CardDescription>
                   <CardTitle>{request.user.name}</CardTitle>
                   <CardDescription>{request.user.email}</CardDescription>
                 </div>
-                <Badge
-                  variant={
-                    request.status === "PENDING"
-                      ? "default"
-                      : request.status === "APPROVED"
-                        ? "secondary"
-                        : "destructive"
-                  }
-                >
-                  {t(request.status)}
-                </Badge>
               </div>
             </CardHeader>
             <CardContent>
@@ -106,7 +98,7 @@ export default function RequestsPage() {
                 <div>
                   <h3 className="font-semibold">{t("purpose_of_contact")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {request.purpose}
+                    {t(request.purpose)}
                   </p>
                 </div>
                 <div>
@@ -125,42 +117,33 @@ export default function RequestsPage() {
                     {request.notes}
                   </p>
                 </div>
-                <div className="flex items-center justify-between">
+                {request.cvUrl && (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() =>
-                      handleDownloadCV(request.cvUrl, request.user.name ?? "")
+                      handleDownloadCV(
+                        request.cvUrl ?? "",
+                        request.user.name ?? "",
+                      )
                     }
                   >
                     <Download className="mr-2 h-4 w-4" />
                     {t("download_cv")}
                   </Button>
-                  {request.status === "PENDING" && (
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleStatusUpdate(request.id, "APPROVED")
-                        }
-                      >
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        {t("approve")}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleStatusUpdate(request.id, "REJECTED")
-                        }
-                      >
-                        <XCircle className="mr-2 h-4 w-4" />
-                        {t("reject")}
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                )}
+                {!request.addedToProject && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="default"
+                      onClick={() => handleAddCollaborator(request)}
+                      className="w-full"
+                    >
+                      <CheckCircle className="me-2 flex h-4 w-4" />
+                      {t("add_to_project")}
+                    </Button>
+                  </div>
+                )}
                 <div className="text-right text-xs text-muted-foreground">
                   {format(new Date(request.createdAt), "PPp")}
                 </div>

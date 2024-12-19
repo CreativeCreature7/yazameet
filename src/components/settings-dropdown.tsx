@@ -43,7 +43,9 @@ export function SettingsDropdown() {
               src={data?.user.image!}
               alt={data?.user.name!}
             />
-            <AvatarFallback>{data?.user.name}</AvatarFallback>
+            <AvatarFallback>
+              {data?.user.name?.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           <span className="sr-only">{t("settings")}</span>
         </Button>

@@ -13,9 +13,7 @@ export const adminRouter = createTRPCRouter({
         ctx.db.user.count(),
         ctx.db.project.count(),
         ctx.db.blogPost.count(),
-        ctx.db.collaborationRequest.count({
-          where: { status: "PENDING" },
-        }),
+        ctx.db.contactRequest.count(),
       ]);
 
     return {

@@ -10,6 +10,7 @@ interface TagSelectProps<T extends string> {
   onChange: (selected: T[]) => void;
   className?: string;
   translationPrefix?: string;
+  maxSelected?: number;
 }
 
 export function TagSelect<T extends string>({
@@ -18,14 +19,19 @@ export function TagSelect<T extends string>({
   onChange,
   className,
   translationPrefix = "",
+  maxSelected,
 }: TagSelectProps<T>) {
   const t = useTranslations();
 
-  const toggleOption = (option: T) => {
+  const handleSelect = (option: T) => {
     if (selectedOptions.includes(option)) {
-      onChange(selectedOptions.filter((item) => item !== option));
+      onChange(selectedOptions.filter((selected) => selected !== option));
     } else {
-      onChange([...selectedOptions, option]);
+      if (maxSelected && selectedOptions.length >= maxSelected) {
+        onChange([option]);
+      } else {
+        onChange([...selectedOptions, option]);
+      }
     }
   };
 
@@ -35,7 +41,7 @@ export function TagSelect<T extends string>({
         <Button
           key={option}
           variant={selectedOptions.includes(option) ? "default" : "outline"}
-          onClick={() => toggleOption(option)}
+          onClick={() => handleSelect(option)}
           className="h-auto border py-1.5 transition-colors"
           size="sm"
           type="button"

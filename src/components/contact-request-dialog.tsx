@@ -18,12 +18,12 @@ import { AutosizeTextarea } from "@/components/ui/autosize-textarea";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
+import { Contact2Icon, Check, InfoIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { TagSelect } from "@/components/ui/tag-select";
-import { Roles } from "@prisma/client";
+import { Roles, ContactPurpose } from "@prisma/client";
 import {
   FileUploader,
   FileInput,
@@ -43,18 +43,25 @@ const BaseSchema = (t: (arg: string) => string) =>
       )
       .min(1),
     cv: z.array(z.instanceof(File)).min(1),
-    purpose: z.string().min(1),
+    purpose: z.nativeEnum(ContactPurpose),
   });
 
 type Props = {
   projectId: number;
+  roles: Roles[];
 };
 
-export function ContactRequestDialog({ projectId }: Props) {
+export function ContactRequestDialog({ projectId, roles }: Props) {
   const t = useTranslations();
   const session = useSession();
   const [openDialog, setOpenDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const formSchema = BaseSchema(t);
+
+  const { data: existingRequest } = api.project.getExistingRequest.useQuery(
+    { projectId },
+    { enabled: !!session.data?.user },
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,7 +69,7 @@ export function ContactRequestDialog({ projectId }: Props) {
       notes: "",
       roles: [],
       cv: [],
-      purpose: "",
+      purpose: ContactPurpose.MOREDETAILS,
     },
   });
 
@@ -81,6 +88,7 @@ export function ContactRequestDialog({ projectId }: Props) {
     api.media.getPresignedUrl.useMutation();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     const file = values.cv[0];
     const { uploadURL } = await getPresignedUrl({
       fileName: file?.name ?? "",
@@ -109,6 +117,7 @@ export function ContactRequestDialog({ projectId }: Props) {
       purpose: values.purpose,
       cv: cvUrl,
     });
+    setIsLoading(false);
   }
 
   const dropZoneConfig = {
@@ -125,16 +134,17 @@ export function ContactRequestDialog({ projectId }: Props) {
   return (
     <Dialog open={openDialog} onOpenChange={() => setOpenDialog(!openDialog)}>
       <DialogTrigger asChild>
-        <Button
-          variant="expandIcon"
-          iconPlacement="right"
-          Icon={MessageCircle}
-          disabled={!session?.data?.user}
-        >
+        <Button variant="default" disabled={!session?.data?.user}>
           {t("contact_project")}
         </Button>
       </DialogTrigger>
       <DialogContent className="hidden-scrollbar overflow-y-scroll">
+        {existingRequest && (
+          <div className="mt-4 flex items-center gap-2 rounded-md bg-primary/90 p-2 text-sm text-white">
+            <InfoIcon className="h-4 w-4" />
+            <span>{t("already_sent_request")}</span>
+          </div>
+        )}
         <div className="w-full">
           <FormProvider {...form}>
             <form
@@ -143,13 +153,13 @@ export function ContactRequestDialog({ projectId }: Props) {
             >
               <FormField
                 control={form.control}
-                name="purpose"
+                name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("purpose_of_contact")}</FormLabel>
+                    <FormLabel>{t("additional_notes")}</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder={t("purpose_placeholder")}
+                      <AutosizeTextarea
+                        placeholder={t("notes_placeholder")}
                         {...field}
                       />
                     </FormControl>
@@ -166,7 +176,7 @@ export function ContactRequestDialog({ projectId }: Props) {
                     <FormLabel>{t("interested_roles")}</FormLabel>
                     <FormControl>
                       <TagSelect
-                        options={Object.values(Roles)}
+                        options={Object.values(roles)}
                         selectedOptions={field.value.map((role) => role.value)}
                         onChange={(selected) => {
                           field.onChange(
@@ -176,23 +186,6 @@ export function ContactRequestDialog({ projectId }: Props) {
                             })),
                           );
                         }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("additional_notes")}</FormLabel>
-                    <FormControl>
-                      <AutosizeTextarea
-                        placeholder={t("notes_placeholder")}
-                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -238,10 +231,34 @@ export function ContactRequestDialog({ projectId }: Props) {
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="purpose"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("purpose_of_contact")}</FormLabel>
+                    <FormControl>
+                      <TagSelect
+                        options={Object.values(ContactPurpose)}
+                        selectedOptions={[field.value]}
+                        onChange={(selected) => {
+                          field.onChange(
+                            selected[0] ?? ContactPurpose.MOREDETAILS,
+                          );
+                        }}
+                        maxSelected={1}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <LoadingButton
                 type="submit"
                 className="w-full"
-                loading={isPending}
+                loading={isPending || isLoading}
+                disabled={isPending || isLoading}
               >
                 {t("send_request")}
               </LoadingButton>

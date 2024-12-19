@@ -43,32 +43,9 @@ export function ProjectCard({
   isOwner,
 }: Props) {
   const t = useTranslations();
-  const utils = api.useUtils();
-  const session = useSession();
   const [readMore, setReadMore] = useState(false);
   const [ellipsisActive, setEllipsisActive] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement | null>(null);
-
-  const { mutate: requestCollaboration } =
-    api.project.requestCollaboration.useMutation({
-      onSuccess: () => {
-        utils.project.getRequestStatus.invalidate();
-        toast.success(t("collaboration_request_sent"));
-      },
-    });
-
-  const handleRequestCollaboration = () => {
-    if (!session.data?.user) {
-      // open login modal
-    } else {
-      requestCollaboration({ id });
-    }
-  };
-
-  const { data: requestStatus } = api.project.getRequestStatus.useQuery(
-    { projectId: id },
-    { enabled: !!session.data?.user },
-  );
 
   const isEllipsisActive = () => {
     return (
@@ -125,22 +102,7 @@ export function ProjectCard({
         )}
         <div className="mt-4 flex flex-row justify-between">
           <div className="flex flex-row">
-            <AnimatedTooltip
-              items={collaborators}
-              size="sm"
-              onPlusClick={handleRequestCollaboration}
-              shouldShowPlusClick={
-                !collaborators.some(
-                  (collaborator) => collaborator.id === session.data?.user.id,
-                ) &&
-                requestStatus?.status !== "PENDING" &&
-                !!session.data?.user
-              }
-              pendingRequest={
-                requestStatus?.status === "PENDING" &&
-                requestStatus.userId === session.data?.user.id
-              }
-            />
+            <AnimatedTooltip items={collaborators} size="sm" />
           </div>
           {isOwner ? (
             <ProjectForm
@@ -159,7 +121,7 @@ export function ProjectCard({
               }}
             />
           ) : (
-            <ContactRequestDialog projectId={id} />
+            <ContactRequestDialog projectId={id} roles={rolesNeeded} />
           )}
         </div>
       </div>

@@ -119,7 +119,7 @@
         "emailSentSuccess": "Email sent!",
         "emailPlaceholder": "example@email.com"
     },
-    "contact_project": "Contact Project",
+    "contact_project": "Let's Talk",
     "purpose_of_contact": "Purpose of Contact",
     "purpose_placeholder": "Why are you interested in this project?",
     "interested_roles": "Interested Roles",
@@ -139,5 +139,11 @@
     "reject": "Reject",
     "PENDING": "Pending",
     "APPROVED": "Approved",
-    "REJECTED": "Rejected"
+    "REJECTED": "Rejected",
+    "MOREDETAILS": "More Details",
+    "COLLAB": "Collab",
+    "MEETFORCOFFEE": "Meet for Coffee",
+    "already_sent_request": "You have already sent a contact request for this project.",
+    "add_to_project": "Add to Project",
+    "collaborator_added_successfully": "Collaborator added successfully"
 }
