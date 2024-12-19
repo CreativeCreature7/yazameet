@@ -44,7 +44,11 @@ export function SettingsDropdown() {
               alt={data?.user.name!}
             />
             <AvatarFallback>
-              {data?.user.name?.charAt(0).toUpperCase()}
+              {data?.user.name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <span className="sr-only">{t("settings")}</span>

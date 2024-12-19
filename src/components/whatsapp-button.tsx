@@ -19,7 +19,7 @@ export function WhatsAppButton({ phoneNumber }: WhatsAppButtonProps) {
   return (
     <Button
       onClick={handleClick}
-      className="h312 fixed bottom-6 z-50 h-12 w-12 rounded-full p-2.5 shadow-lg transition-transform duration-200 hover:scale-110 md:h-16 md:w-16 md:p-2 ltr:right-3 rtl:left-3"
+      className="fixed bottom-3 z-50 h-12 w-12 rounded-full p-2.5 shadow-lg transition-transform duration-200 hover:scale-110 md:h-16 md:w-16 md:p-2 ltr:left-2 rtl:right-2"
       variant="default"
     >
       <MessageCircle className="h-8 w-8" />

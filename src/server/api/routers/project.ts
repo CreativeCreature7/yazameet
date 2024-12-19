@@ -423,4 +423,44 @@ export const projectRouter = createTRPCRouter({
       });
       return request;
     }),
+
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Verify user is project owner
+      const project = await ctx.db.project.findUnique({
+        where: { id: input.id },
+        select: { createdById: true },
+      });
+
+      if (!project) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Project not found",
+        });
+      }
+
+      if (project.createdById !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only project owner can delete the project",
+        });
+      }
+
+      // Delete the project and related records in a transaction
+      return ctx.db.$transaction([
+        // First delete all contact requests
+        ctx.db.contactRequest.deleteMany({
+          where: { projectId: input.id },
+        }),
+        // Then delete the project
+        ctx.db.project.delete({
+          where: { id: input.id },
+        }),
+      ]);
+    }),
 });

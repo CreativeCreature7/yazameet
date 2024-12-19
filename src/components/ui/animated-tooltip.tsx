@@ -135,7 +135,11 @@ export const AnimatedTooltip = ({
               className={cn(tooltipVariants({ size }))}
             >
               <AvatarFallback>
-                {item.name?.charAt(0).toUpperCase()}
+                {item.name
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()}
               </AvatarFallback>
             </Avatar>
           )}
