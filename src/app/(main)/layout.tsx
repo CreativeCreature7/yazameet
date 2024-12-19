@@ -1,5 +1,12 @@
 import { Header } from "@/components/header";
 import { WhatsAppButton } from "@/components/whatsapp-button";
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  openGraph: {
+    images: ["/images/og-image.png"],
+  },
+};
 
 export default function MainLayout({
   children,

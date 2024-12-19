@@ -259,7 +259,7 @@ export const projectRouter = createTRPCRouter({
         notes: z.string(),
         purpose: z.nativeEnum(ContactPurpose),
         roles: z.array(z.nativeEnum(Roles)),
-        cv: z.string(),
+        cv: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

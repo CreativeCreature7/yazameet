@@ -42,7 +42,7 @@ const BaseSchema = (t: (arg: string) => string) =>
         }),
       )
       .min(1),
-    cv: z.array(z.instanceof(File)).min(1),
+    cv: z.array(z.instanceof(File)).optional(),
     purpose: z.nativeEnum(ContactPurpose),
   });
 
@@ -89,26 +89,29 @@ export function ContactRequestDialog({ projectId, roles }: Props) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    const file = values.cv[0];
-    const { uploadURL } = await getPresignedUrl({
-      fileName: file?.name ?? "",
-      fileType: file?.type ?? "",
-    });
+    let cvUrl = undefined;
+    if (values.cv && values.cv.length > 0) {
+      const file = values.cv[0];
+      const { uploadURL } = await getPresignedUrl({
+        fileName: file?.name ?? "",
+        fileType: file?.type ?? "",
+      });
 
-    const { status } = await fetch(uploadURL, {
-      method: "PUT",
-      body: file,
-      headers: {
-        "Content-type": file?.type ?? "",
-      },
-    });
+      const { status } = await fetch(uploadURL, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-type": file?.type ?? "",
+        },
+      });
 
-    if (status !== 200) {
-      toast.error(t("error_uploading_file"));
-      return;
+      if (status !== 200) {
+        toast.error(t("error_uploading_file"));
+        return;
+      }
+
+      cvUrl = uploadURL.split("?")[0] ?? "";
     }
-
-    const cvUrl = uploadURL.split("?")[0] ?? "";
 
     submitRequest({
       projectId,
@@ -200,7 +203,7 @@ export function ContactRequestDialog({ projectId, roles }: Props) {
                   <FormItem>
                     <FormLabel>{t("upload_cv")}</FormLabel>
                     <FileUploader
-                      value={field.value}
+                      value={field.value ?? null}
                       onValueChange={field.onChange}
                       dropzoneOptions={dropZoneConfig}
                       reSelect={true}
