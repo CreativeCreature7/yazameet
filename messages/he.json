@@ -143,8 +143,11 @@
     "REJECTED": "נדחה",
     "MOREDETAILS": "עוד פרטים",
     "COLLAB": "שת״פ",
-    "MEETFORCOFFEE": "להפגש לקפה",
+    "MEETFORCOFFEE": "להפגש לקפה :)",
     "already_sent_request": "כבר שלחת בקשת יצירת קשר עבור פרויקט זה.",
     "add_to_project": "הוסף לפרויקט",
-    "collaborator_added_successfully": "שותף נוסף בהצלחה"
+    "collaborator_added_successfully": "שותף נוסף בהצלחה",
+    "this_action_cannot_be_undone": "פעולה זו לא ניתנת לביטול",
+    "cancel": "ביטול",
+    "delete": "מחק"
 }

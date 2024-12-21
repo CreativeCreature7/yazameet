@@ -6,11 +6,8 @@ import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Roles, User, ProjectType } from "@prisma/client";
 import { useTranslations } from "next-intl";
-import { api } from "@/trpc/react";
-import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { ProjectForm } from "@/app/_components/project-form";
-import { toast } from "sonner";
 import { ContactRequestDialog } from "@/components/contact-request-dialog";
 
 const colorByType = {
@@ -58,6 +55,12 @@ export function ProjectCard({
     setEllipsisActive(!!isEllipsisActive());
   }, [descriptionRef.current]);
 
+  const getRoleCount = (role: Roles) => {
+    return rolesNeeded.filter((r) => r === role).length;
+  };
+
+  const uniqueRoles = Array.from(new Set(rolesNeeded));
+
   return (
     <div
       key={id}
@@ -79,11 +82,14 @@ export function ProjectCard({
           {name}
         </h2>
         <div>
-          {rolesNeeded?.map((role) => (
-            <Badge key={role} className="mb-2 me-2 last:me-0">
-              {t(role)}
-            </Badge>
-          ))}
+          {uniqueRoles.map((role) => {
+            const count = getRoleCount(role);
+            return (
+              <Badge key={role} className="mb-2 me-2 last:me-0">
+                {t(role)}{count > 1 ? ` (${count}x)` : ''}
+              </Badge>
+            );
+          })}
         </div>
         <p
           ref={descriptionRef}

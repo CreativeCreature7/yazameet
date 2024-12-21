@@ -30,6 +30,7 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
+import { LoginModal } from "@/components/auth/login-modal";
 
 const BaseSchema = (t: (arg: string) => string) =>
   z.object({
@@ -55,6 +56,7 @@ export function ContactRequestDialog({ projectId, roles }: Props) {
   const t = useTranslations();
   const session = useSession();
   const [openDialog, setOpenDialog] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const formSchema = BaseSchema(t);
 
@@ -134,141 +136,158 @@ export function ContactRequestDialog({ projectId, roles }: Props) {
     maxSize: 5 * 1024 * 1024, // 5MB
   };
 
+  const uniqueRoles = Array.from(new Set(roles));
+
   return (
-    <Dialog open={openDialog} onOpenChange={() => setOpenDialog(!openDialog)}>
-      <DialogTrigger asChild>
-        <Button variant="default" disabled={!session?.data?.user}>
-          {t("contact_project")}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="hidden-scrollbar overflow-y-scroll">
-        {existingRequest && (
-          <div className="mt-4 flex items-center gap-2 rounded-md bg-primary/90 p-2 text-sm text-white">
-            <InfoIcon className="h-4 w-4" />
-            <span>{t("already_sent_request")}</span>
-          </div>
-        )}
-        <div className="w-full">
-          <FormProvider {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="relative grid h-full w-full gap-4"
-            >
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("additional_notes")}</FormLabel>
-                    <FormControl>
-                      <AutosizeTextarea
-                        placeholder={t("notes_placeholder")}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="roles"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("interested_roles")}</FormLabel>
-                    <FormControl>
-                      <TagSelect
-                        options={Object.values(roles)}
-                        selectedOptions={field.value.map((role) => role.value)}
-                        onChange={(selected) => {
-                          field.onChange(
-                            selected.map((value) => ({
-                              value,
-                              label: t(value),
-                            })),
-                          );
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="cv"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("upload_cv")}</FormLabel>
-                    <FileUploader
-                      value={field.value ?? null}
-                      onValueChange={field.onChange}
-                      dropzoneOptions={dropZoneConfig}
-                      reSelect={true}
-                    >
-                      <FileInput className="outline-dashed outline-1 outline-black dark:outline-white">
-                        <div className="flex w-full flex-col items-center justify-center p-4">
-                          <p className="text-sm text-muted-foreground">
-                            {t("drag_drop_cv")}
-                          </p>
-                        </div>
-                      </FileInput>
-                      {field.value && field.value.length > 0 && (
-                        <FileUploaderContent>
-                          {field.value.map((file, i) => (
-                            <FileUploaderItem
-                              key={i}
-                              index={i}
-                              className="w-full"
-                            >
-                              {file.name}
-                            </FileUploaderItem>
-                          ))}
-                        </FileUploaderContent>
-                      )}
-                    </FileUploader>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="purpose"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("purpose_of_contact")}</FormLabel>
-                    <FormControl>
-                      <TagSelect
-                        options={Object.values(ContactPurpose)}
-                        selectedOptions={[field.value]}
-                        onChange={(selected) => {
-                          field.onChange(
-                            selected[0] ?? ContactPurpose.MOREDETAILS,
-                          );
-                        }}
-                        maxSelected={1}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <LoadingButton
-                type="submit"
-                className="w-full"
-                loading={isPending || isLoading}
-                disabled={isPending || isLoading}
+    <>
+      <Dialog open={openDialog} onOpenChange={() => setOpenDialog(!openDialog)}>
+        <DialogTrigger asChild>
+          <Button 
+            variant="default" 
+            onClick={(e) => {
+              if (!session?.data?.user) {
+                e.preventDefault();
+                setIsLoginModalOpen(true);
+              }
+            }}
+          >
+            {t("contact_project")}
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="hidden-scrollbar overflow-y-scroll">
+          {existingRequest && (
+            <div className="mt-4 flex items-center gap-2 rounded-md bg-primary/90 p-2 text-sm text-white">
+              <InfoIcon className="h-4 w-4" />
+              <span>{t("already_sent_request")}</span>
+            </div>
+          )}
+          <div className="w-full">
+            <FormProvider {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="relative grid h-full w-full gap-4"
               >
-                {t("send_request")}
-              </LoadingButton>
-            </form>
-          </FormProvider>
-        </div>
-      </DialogContent>
-    </Dialog>
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("additional_notes")}</FormLabel>
+                      <FormControl>
+                        <AutosizeTextarea
+                          placeholder={t("notes_placeholder")}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="roles"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("interested_roles")}</FormLabel>
+                      <FormControl>
+                        <TagSelect
+                          options={uniqueRoles}
+                          selectedOptions={field.value.map((role) => role.value)}
+                          onChange={(selected) => {
+                            field.onChange(
+                              selected.map((value) => ({
+                                value,
+                                label: t(value),
+                              })),
+                            );
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="cv"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("upload_cv")}</FormLabel>
+                      <FileUploader
+                        value={field.value ?? null}
+                        onValueChange={field.onChange}
+                        dropzoneOptions={dropZoneConfig}
+                        reSelect={true}
+                      >
+                        <FileInput className="outline-dashed outline-1 outline-black dark:outline-white">
+                          <div className="flex w-full flex-col items-center justify-center p-4">
+                            <p className="text-sm text-muted-foreground">
+                              {t("drag_drop_cv")}
+                            </p>
+                          </div>
+                        </FileInput>
+                        {field.value && field.value.length > 0 && (
+                          <FileUploaderContent>
+                            {field.value.map((file, i) => (
+                              <FileUploaderItem
+                                key={i}
+                                index={i}
+                                className="w-full"
+                              >
+                                {file.name}
+                              </FileUploaderItem>
+                            ))}
+                          </FileUploaderContent>
+                        )}
+                      </FileUploader>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="purpose"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("purpose_of_contact")}</FormLabel>
+                      <FormControl>
+                        <TagSelect
+                          options={Object.values(ContactPurpose)}
+                          selectedOptions={[field.value]}
+                          onChange={(selected) => {
+                            field.onChange(
+                              selected[0] ?? ContactPurpose.MOREDETAILS,
+                            );
+                          }}
+                          maxSelected={1}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <LoadingButton
+                  type="submit"
+                  className="w-full"
+                  loading={isPending || isLoading}
+                  disabled={isPending || isLoading}
+                >
+                  {t("send_request")}
+                </LoadingButton>
+              </form>
+            </FormProvider>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
+    </>
   );
 }

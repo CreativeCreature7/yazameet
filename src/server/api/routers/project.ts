@@ -221,10 +221,14 @@ export const projectRouter = createTRPCRouter({
         });
       }
 
-      // Remove the roles that the new collaborator will take
-      const updatedRoles = project.rolesNeeded.filter(
-        (role) => !roles.includes(role),
-      );
+      // Remove one instance of each role that the new collaborator will take
+      const updatedRoles = [...project.rolesNeeded];
+      for (const role of roles) {
+        const index = updatedRoles.indexOf(role);
+        if (index !== -1) {
+          updatedRoles.splice(index, 1);
+        }
+      }
 
       // Update project with new collaborator and updated roles
       const updatedProject = await ctx.db.$transaction([

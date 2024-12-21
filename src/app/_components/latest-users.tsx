@@ -10,11 +10,11 @@ export default function LatestUsers() {
   if (isLoading || !people)
     return (
       <div className="flex flex-row">
-        <Skeleton className="-me-2 h-14 w-14 rounded-full" />
-        <Skeleton className="-me-2 h-14 w-14 rounded-full" />
-        <Skeleton className="-me-2 h-14 w-14 rounded-full" />
-        <Skeleton className="-me-2 h-14 w-14 rounded-full" />
-        <Skeleton className="-me-2 h-14 w-14 rounded-full" />
+        <Skeleton className="-me-4 h-14 w-14 rounded-full" />
+        <Skeleton className="-me-4 h-14 w-14 rounded-full" />
+        <Skeleton className="-me-4 h-14 w-14 rounded-full" />
+        <Skeleton className="-me-4 h-14 w-14 rounded-full" />
+        <Skeleton className="-me-4 h-14 w-14 rounded-full" />
         <Skeleton className="h-14 w-14 rounded-full" />
       </div>
     );

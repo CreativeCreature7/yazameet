@@ -103,6 +103,7 @@
     "filter": "Filter",
     "update_project": "Update Project",
     "project_type": "Project Type",
+    "roles": "Roles",
     "login_to_add_project": "Login to see Projects from Up-Rise",
     "auth": {
         "createAccountOrLogin": "Create an account or log in",
@@ -145,5 +146,8 @@
     "MEETFORCOFFEE": "Meet for Coffee",
     "already_sent_request": "You have already sent a contact request for this project.",
     "add_to_project": "Add to Project",
-    "collaborator_added_successfully": "Collaborator added successfully"
+    "collaborator_added_successfully": "Collaborator added successfully",
+    "this_action_cannot_be_undone": "This action cannot be undone",
+    "cancel": "Cancel",
+    "delete": "Delete"
 }
