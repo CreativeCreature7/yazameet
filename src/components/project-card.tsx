@@ -6,11 +6,9 @@ import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Roles, User, ProjectType } from "@prisma/client";
 import { useTranslations } from "next-intl";
-import { api } from "@/trpc/react";
-import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { ProjectForm } from "@/app/_components/project-form";
-import { toast } from "sonner";
+import { ContactRequestDialog } from "@/components/contact-request-dialog";
 
 const colorByType = {
   NONPROFIT: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
@@ -42,32 +40,9 @@ export function ProjectCard({
   isOwner,
 }: Props) {
   const t = useTranslations();
-  const utils = api.useUtils();
-  const session = useSession();
   const [readMore, setReadMore] = useState(false);
   const [ellipsisActive, setEllipsisActive] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement | null>(null);
-
-  const { mutate: requestCollaboration } =
-    api.project.requestCollaboration.useMutation({
-      onSuccess: () => {
-        utils.project.getRequestStatus.invalidate();
-        toast.success(t("collaboration_request_sent"));
-      },
-    });
-
-  const handleRequestCollaboration = () => {
-    if (!session.data?.user) {
-      // open login modal
-    } else {
-      requestCollaboration({ id });
-    }
-  };
-
-  const { data: requestStatus } = api.project.getRequestStatus.useQuery(
-    { projectId: id },
-    { enabled: !!session.data?.user },
-  );
 
   const isEllipsisActive = () => {
     return (
@@ -79,6 +54,12 @@ export function ProjectCard({
   useEffect(() => {
     setEllipsisActive(!!isEllipsisActive());
   }, [descriptionRef.current]);
+
+  const getRoleCount = (role: Roles) => {
+    return rolesNeeded.filter((r) => r === role).length;
+  };
+
+  const uniqueRoles = Array.from(new Set(rolesNeeded));
 
   return (
     <div
@@ -101,11 +82,14 @@ export function ProjectCard({
           {name}
         </h2>
         <div>
-          {rolesNeeded?.map((role) => (
-            <Badge key={role} className="mb-2 me-2 last:me-0">
-              {t(role)}
-            </Badge>
-          ))}
+          {uniqueRoles.map((role) => {
+            const count = getRoleCount(role);
+            return (
+              <Badge key={role} className="mb-2 me-2 last:me-0">
+                {t(role)}{count > 1 ? ` (${count}x)` : ''}
+              </Badge>
+            );
+          })}
         </div>
         <p
           ref={descriptionRef}
@@ -124,24 +108,9 @@ export function ProjectCard({
         )}
         <div className="mt-4 flex flex-row justify-between">
           <div className="flex flex-row">
-            <AnimatedTooltip
-              items={collaborators}
-              size="sm"
-              onPlusClick={handleRequestCollaboration}
-              shouldShowPlusClick={
-                !collaborators.some(
-                  (collaborator) => collaborator.id === session.data?.user.id,
-                ) &&
-                requestStatus?.status !== "PENDING" &&
-                !!session.data?.user
-              }
-              pendingRequest={
-                requestStatus?.status === "PENDING" &&
-                requestStatus.userId === session.data?.user.id
-              }
-            />
+            <AnimatedTooltip items={collaborators} size="sm" />
           </div>
-          {isOwner && (
+          {isOwner ? (
             <ProjectForm
               id={id}
               values={{
@@ -157,6 +126,8 @@ export function ProjectCard({
                 })),
               }}
             />
+          ) : (
+            <ContactRequestDialog projectId={id} roles={rolesNeeded} />
           )}
         </div>
       </div>

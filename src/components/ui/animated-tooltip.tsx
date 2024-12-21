@@ -15,6 +15,7 @@ import { Clock, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const tooltipVariants = cva(
   "relative !m-0 rounded-full border-2 border-white object-cover object-top !p-0 transition duration-500 group-hover:z-30 group-hover:scale-105",
@@ -119,14 +120,29 @@ export const AnimatedTooltip = ({
               </motion.div>
             )}
           </AnimatePresence>
-          <Image
-            onMouseMove={handleMouseMove}
-            height={100}
-            width={100}
-            src={item.image ?? ""}
-            alt={item.name ?? ""}
-            className={cn(tooltipVariants({ size }))}
-          />
+          {item.image ? (
+            <Image
+              onMouseMove={handleMouseMove}
+              height={100}
+              width={100}
+              src={item.image}
+              alt={item.name ?? ""}
+              className={cn(tooltipVariants({ size }))}
+            />
+          ) : (
+            <Avatar
+              onMouseMove={handleMouseMove}
+              className={cn(tooltipVariants({ size }))}
+            >
+              <AvatarFallback>
+                {item.name
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          )}
         </div>
       ))}
       {shouldShowPlusClick && onPlusClick && (

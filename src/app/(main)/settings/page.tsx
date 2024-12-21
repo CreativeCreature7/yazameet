@@ -44,10 +44,11 @@ import { api } from "@/trpc/react";
 import { DropzoneOptions } from "react-dropzone";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { toast } from "sonner";
+import { profilePictureSchema } from "@/lib/schemas";
 
 const BaseSchema = (t: (arg: string) => string) =>
   z.object({
-    profilePicture: z.array(z.instanceof(File)).optional(),
+    profilePicture: profilePictureSchema,
     roles: z.array(optionRolesSchema).min(1),
     fullName: z.string().min(1),
     year: z.nativeEnum(Year),
@@ -121,7 +122,7 @@ export default function Settings() {
     multiple: true,
   };
 
-  const { mutate: updateDetails } = api.user.updateDetails.useMutation({
+  const { mutate: addDetails } = api.user.addDetails.useMutation({
     onSuccess: async () => {
       await utils.user.getCurrentUser.invalidate();
       toast.success(t("profile_updated_successfully"));
@@ -157,17 +158,18 @@ export default function Settings() {
 
     const updatedValues = {
       ...values,
-      profilePicture: profilePictureUrl!,
+      profilePicture: profilePictureUrl ?? undefined,
       roles: values.roles.map((role) => role.value),
     };
-    updateDetails(updatedValues);
+    
+    addDetails(updatedValues);
     setIsLoading(false);
   }
 
   if (!user) return null;
 
   return (
-    <div className="flex h-full min-h-screen items-center justify-center">
+    <div className="mx-4 mt-14 md:mt-40">
       <Card className="mx-auto mt-6 max-w-sm">
         <CardHeader>
           <CardTitle>{t("settings")}</CardTitle>
@@ -227,13 +229,15 @@ export default function Settings() {
                     <FormControl>
                       <TagSelect
                         options={Object.values(Roles)}
-                        selectedOptions={field.value?.map((role) => role.value) ?? []}
+                        selectedOptions={
+                          field.value?.map((role) => role.value) ?? []
+                        }
                         onChange={(selected) => {
                           field.onChange(
                             selected.map((value) => ({
                               value,
                               label: t(value),
-                            }))
+                            })),
                           );
                         }}
                       />

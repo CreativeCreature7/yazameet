@@ -5,13 +5,12 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
-import { ProjectType, Roles } from "@prisma/client";
+import { ProjectType, Roles, ContactPurpose } from "@prisma/client";
 import { sendEmail } from "@/lib/email";
-import NewRequestEmail from "@/components/emails/new-request";
-import ApprovedRequestEmail from "@/components/emails/approved-request";
-import RejectedRequestEmail from "@/components/emails/rejected-request";
 import { inngest } from "@/lib/inngest";
 import { Event_NEW_PROJECT } from "@/inngest/functions";
+import { TRPCError } from "@trpc/server";
+import ContactRequestEmail from "@/components/emails/contact-request";
 
 export const projectRouter = createTRPCRouter({
   create: protectedProcedure
@@ -165,7 +164,7 @@ export const projectRouter = createTRPCRouter({
               image: true,
             },
           },
-          CollaborationRequest: {
+          ContactRequest: {
             include: {
               user: {
                 select: {
@@ -191,135 +190,281 @@ export const projectRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.number().min(1),
+        userId: z.string(),
+        roles: z.array(z.nativeEnum(Roles)),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { id } = input;
-      const project = await ctx.db.project.update({
-        where: {
-          id,
+      const { id, userId, roles } = input;
+
+      // Get current project
+      const project = await ctx.db.project.findUnique({
+        where: { id },
+        select: {
+          rolesNeeded: true,
+          createdById: true,
         },
+      });
+
+      if (!project) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Project not found",
+        });
+      }
+
+      // Verify user is project owner
+      if (project.createdById !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only project owner can add collaborators",
+        });
+      }
+
+      // Remove one instance of each role that the new collaborator will take
+      const updatedRoles = [...project.rolesNeeded];
+      for (const role of roles) {
+        const index = updatedRoles.indexOf(role);
+        if (index !== -1) {
+          updatedRoles.splice(index, 1);
+        }
+      }
+
+      // Update project with new collaborator and updated roles
+      const updatedProject = await ctx.db.$transaction([
+        // Add collaborator
+        ctx.db.project.update({
+          where: { id },
+          data: {
+            collaborators: {
+              connect: { id: userId },
+            },
+            rolesNeeded: updatedRoles,
+          },
+        }),
+        // Update contact request status
+        ctx.db.contactRequest.updateMany({
+          where: {
+            projectId: id,
+            userId: userId,
+          },
+          data: {
+            addedToProject: true,
+          },
+        }),
+      ]);
+
+      return updatedProject[0];
+    }),
+  submitContactRequest: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        notes: z.string(),
+        purpose: z.nativeEnum(ContactPurpose),
+        roles: z.array(z.nativeEnum(Roles)),
+        cv: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { projectId, notes, purpose, roles, cv } = input;
+
+      const project = await ctx.db.project.findUnique({
+        where: { id: projectId },
+        include: {
+          createdBy: true,
+        },
+      });
+
+      if (!project) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Project not found",
+        });
+      }
+
+      // Create contact request
+      const contactRequest = await ctx.db.contactRequest.create({
         data: {
-          collaborators: {
-            connect: { id: ctx.session?.user.id },
+          notes,
+          purpose,
+          cvUrl: cv,
+          roles,
+          project: {
+            connect: { id: projectId },
+          },
+          user: {
+            connect: { id: ctx.session.user.id },
           },
         },
+        include: {
+          user: true,
+        },
       });
 
-      return project;
+      // Send email notification to project owner
+      await sendEmail({
+        to: project.createdBy.email!,
+        subject: `New Contact Request for ${project.name}`,
+        react: ContactRequestEmail({
+          projectName: project.name,
+          requesterName: contactRequest.user.name!,
+          purpose: input.purpose,
+          requestUrl: `https://yazameet.vercel.app/dashboard/requests`,
+        }),
+      });
+
+      return contactRequest;
     }),
 
-  delete: protectedProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.collaborationRequest.deleteMany({
-        where: { projectId: input.id },
-      });
+  getContactRequests: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { projectId } = input;
 
-      // Then delete the project
-      return ctx.db.project.delete({
-        where: { id: input.id },
-      });
-    }),
-  requestCollaboration: protectedProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ ctx, input }) => {
+      // Verify user is project owner
       const project = await ctx.db.project.findUnique({
-        where: { id: input.id },
-        include: { createdBy: true },
+        where: { id: projectId },
       });
 
-      if (!project) throw new Error("Project not found");
+      if (!project || project.createdById !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to view these requests",
+        });
+      }
 
-      await ctx.db.collaborationRequest.create({
-        data: {
-          projectId: input.id,
+      return ctx.db.contactRequest.findMany({
+        where: {
+          projectId,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
+
+  getMyProjects: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.project.findMany({
+      where: {
+        createdById: ctx.session.user.id,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+  }),
+
+  getAllContactRequests: protectedProcedure
+    .input(
+      z.object({
+        projectIds: z.array(z.number()),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { projectIds } = input;
+
+      // Verify user owns all projects
+      const projects = await ctx.db.project.findMany({
+        where: {
+          id: { in: projectIds },
+          createdById: ctx.session.user.id,
+        },
+        select: { id: true },
+      });
+
+      const authorizedProjectIds = projects.map((p) => p.id);
+
+      return ctx.db.contactRequest.findMany({
+        where: {
+          projectId: { in: authorizedProjectIds },
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+          project: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    }),
+
+  getExistingRequest: protectedProcedure
+    .input(z.object({ projectId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const request = await ctx.db.contactRequest.findFirst({
+        where: {
+          projectId: input.projectId,
           userId: ctx.session.user.id,
         },
       });
-
-      if (process.env.NODE_ENV === "production") {
-        await sendEmail({
-          to: project.createdBy.email!,
-          subject: "New Collaboration Request",
-          react: NewRequestEmail({
-            projectName: project.name,
-            requesterName: ctx.session.user.name!,
-            requestUrl: `https://yazameet.vercel.app/request/${project.id}`,
-          }),
-        });
-      }
-
-      return { success: true };
+      return request;
     }),
-  getRequestStatus: protectedProcedure
-    .input(z.object({ projectId: z.number() }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.collaborationRequest.findFirst({
-        where: { projectId: input.projectId, userId: ctx.session.user.id },
-      });
-    }),
-  updateRequest: protectedProcedure
+
+  delete: protectedProcedure
     .input(
       z.object({
-        id: z.number(),
-        status: z.enum(["APPROVED", "REJECTED"]),
+        id: z.number().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const request = await ctx.db.collaborationRequest.findUnique({
+      // Verify user is project owner
+      const project = await ctx.db.project.findUnique({
         where: { id: input.id },
-        include: { project: true, user: true },
+        select: { createdById: true },
       });
 
-      if (!request) {
-        throw new Error("Request not found");
-      }
-
-      // Check if user is project owner
-      if (request.project.createdById !== ctx.session.user.id) {
-        throw new Error("Unauthorized");
-      }
-
-      const updatedRequest = await ctx.db.collaborationRequest.update({
-        where: { id: input.id },
-        data: { status: input.status },
-      });
-
-      // If approved, add user as collaborator
-      if (input.status === "APPROVED") {
-        await ctx.db.project.update({
-          where: { id: request.projectId },
-          data: {
-            collaborators: {
-              connect: { id: request.userId },
-            },
-          },
+      if (!project) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Project not found",
         });
-        if (process.env.NODE_ENV === "production") {
-          await sendEmail({
-            to: request.user.email!,
-            subject: `Great News, ${request.project.name} 🎉 From Yazameet`,
-            react: ApprovedRequestEmail({
-              projectName: request.project.name,
-              requesterName: ctx.session.user.name!,
-            }),
-          });
-        }
-      }
-      if (input.status === "REJECTED") {
-        if (process.env.NODE_ENV === "production") {
-          await sendEmail({
-            to: request.user.email!,
-            subject: `Update on Your Request to: ${request.project.name}`,
-            react: RejectedRequestEmail({
-              projectName: request.project.name,
-              requesterName: ctx.session.user.name!,
-            }),
-          });
-        }
       }
 
-      return updatedRequest;
+      if (project.createdById !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only project owner can delete the project",
+        });
+      }
+
+      // Delete the project and related records in a transaction
+      return ctx.db.$transaction([
+        // First delete all contact requests
+        ctx.db.contactRequest.deleteMany({
+          where: { projectId: input.id },
+        }),
+        // Then delete the project
+        ctx.db.project.delete({
+          where: { id: input.id },
+        }),
+      ]);
     }),
 });

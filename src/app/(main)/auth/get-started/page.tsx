@@ -120,7 +120,7 @@ export default function SignUp() {
   };
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl");
+  const callbackUrl = searchParams?.get("callbackUrl");
 
   const { mutate: addDetails } = api.user.addDetails.useMutation();
   const { mutateAsync: getPresignedUrl } =
