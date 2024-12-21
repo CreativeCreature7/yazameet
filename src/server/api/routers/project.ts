@@ -310,7 +310,7 @@ export const projectRouter = createTRPCRouter({
           projectName: project.name,
           requesterName: contactRequest.user.name!,
           purpose: input.purpose,
-          requestUrl: `/dashboard/requests`,
+          requestUrl: `https://yazameet.vercel.app/dashboard/requests`,
         }),
       });
 
