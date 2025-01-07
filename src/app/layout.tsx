@@ -15,6 +15,12 @@ export const metadata: Metadata = {
   title: "Yazameet",
   description: "",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 const fontSans = FontSans({
