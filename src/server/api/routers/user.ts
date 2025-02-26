@@ -13,7 +13,7 @@ export const userRouter = createTRPCRouter({
       z
         .object({
           fullName: z.string().min(1),
-          profilePicture: z.string().max(1).optional(),
+          profilePicture: z.string().optional(),
           year: z.nativeEnum(Year),
           roles: z.array(z.nativeEnum(Roles)).min(1),
         })
