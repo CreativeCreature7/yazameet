@@ -39,7 +39,7 @@ export default async function RootLayout({
     <html lang={locale} dir={dir} className={`${GeistSans.variable}`}>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "flex min-h-screen flex-col bg-background font-sans antialiased",
           fontSans.variable,
         )}
       >
