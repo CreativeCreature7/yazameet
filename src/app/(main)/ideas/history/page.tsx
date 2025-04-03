@@ -48,7 +48,9 @@ export default function IdeationHistory() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">{t("title")}</h1>
         <Button asChild>
-          <Link href="/ideas/new">{t("new_session", { ns: "ideas" })}</Link>
+          <Link href="/ideas/new">
+            {t("start_new_session", { ns: "ideas" })}
+          </Link>
         </Button>
       </div>
 

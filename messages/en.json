@@ -178,7 +178,8 @@
       "ideas_count": "ideas",
       "winning_idea": "Winning Idea:",
       "view_details": "View Details",
-      "export_results": "Export Results"
+      "export_results": "Export Results",
+      "start_new_session": "Start New Ideation Session"
     },
     "session": {
       "team_session": "Team Session",
