@@ -34,6 +34,12 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { TagSelect } from "@/components/ui/tag-select";
 import { LoginModal } from "@/components/auth/login-modal";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
 const BaseSchema = (t: (arg: string) => string) =>
   z.object({
@@ -109,19 +115,28 @@ export function ProjectForm({ values, id, defaultType }: props) {
       <Dialog open={openDialog} onOpenChange={() => setOpenDialog(!openDialog)}>
         <DialogTrigger asChild>
           {!id ? (
-            <Button
-              variant="expandIcon"
-              iconPlacement="right"
-              Icon={PlusIcon}
-              onClick={(e) => {
-                if (!session?.data?.user) {
-                  e.preventDefault();
-                  setIsLoginModalOpen(true);
-                }
-              }}
-            >
-              {t("add_new_project")}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="p-2"
+                    onClick={(e) => {
+                      if (!session?.data?.user) {
+                        e.preventDefault();
+                        setIsLoginModalOpen(true);
+                      } else {
+                        setOpenDialog(true);
+                      }
+                    }}
+                  >
+                    <PlusIcon />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t("add_new_project")}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ) : (
             <Button variant="ringHover" className="rounded-full p-2">
               <PencilIcon className="h-6 w-6" />
@@ -279,7 +294,7 @@ export function ProjectForm({ values, id, defaultType }: props) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

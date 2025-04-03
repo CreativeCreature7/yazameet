@@ -25,7 +25,7 @@ export default async function Home() {
   return (
     <main className="mx-6 flex flex-1 items-center justify-center md:mx-0">
       <div className="flex flex-col items-center justify-center">
-        <div className="mx-auto text-xl font-normal md:text-4xl">
+        <div className="mx-auto mb-16 text-xl font-normal md:text-4xl">
           <h1 className="mb-6 max-w-[800px] text-[38px] leading-[36px] -tracking-wider md:text-[64px] md:leading-[60px]">
             {t("reichman_university_entrepreneurship_hub")}
           </h1>

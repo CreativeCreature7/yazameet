@@ -169,8 +169,8 @@ export default function SignUp() {
   }
 
   return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <Card className="mt-16 max-w-sm xl:mt-40">
+    <div className="mx-4 my-4 flex flex-1 items-center justify-center">
+      <Card className="max-w-lg">
         <CardHeader>
           <CardTitle className="text-2xl">{t("profile_details")}</CardTitle>
           <CardDescription>{t("in_order_to_continue")}</CardDescription>

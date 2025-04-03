@@ -19,8 +19,8 @@ export default async function UpriseProjectsList() {
 
   return (
     <HydrateClient>
-      <main className="flex h-full flex-col items-start justify-start">
-        <div className="mb-8 flex w-full items-center justify-center xl:mt-8">
+      <main className="flex flex-1 flex-col items-start justify-start">
+        <div className="mb-8 flex w-full items-center justify-center">
           <Image
             src={LogoUprise}
             alt="Up-Rise Logo"

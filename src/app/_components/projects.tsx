@@ -12,6 +12,7 @@ import { Option } from "@/components/ui/multi-select";
 import { ProjectType, Roles } from "@prisma/client";
 import { FilterDialog } from "@/app/_components/filter-dialog";
 import { useSession } from "next-auth/react";
+import { ProjectForm } from "@/app/_components/project-form";
 
 const Projects = () => {
   const t = useTranslations();
@@ -38,8 +39,11 @@ const Projects = () => {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <div className="flex flex-col gap-4">
-        <div className="relative">
+      <div className="flex w-full flex-row gap-4">
+        <div className="inline-block">
+          <ProjectForm />
+        </div>
+        <div className="relative inline-block w-full">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground rtl:right-3" />
           <Input
             placeholder={t("search_projects")}
@@ -47,7 +51,6 @@ const Projects = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 rtl:pr-9"
           />
-
           <FilterDialog
             selectedTypes={selectedTypes}
             setSelectedTypes={setSelectedTypes}

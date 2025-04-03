@@ -103,7 +103,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <Button
             variant="outline"
             className="flex items-center gap-2"
-            onClick={() => signIn("google")}
+            onClick={() => signIn("google", { callbackUrl: "/projects" })}
           >
             <img
               src="https://authjs.dev/img/providers/google.svg"
@@ -116,7 +116,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <Button
             variant="outline"
             className="flex items-center gap-2"
-            onClick={() => signIn("discord")}
+            onClick={() => signIn("discord", { callbackUrl: "/projects" })}
           >
             <img
               src="https://authjs.dev/img/providers/discord.svg"

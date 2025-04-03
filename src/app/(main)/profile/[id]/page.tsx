@@ -18,7 +18,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
   if (!profile) return <div>Profile not found</div>;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4">
+    <div className="mx-4 my-4 flex flex-1 items-center justify-center">
       <div className="w-full max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -107,7 +107,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
 function ProfileSkeleton() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4">
+    <div className="mx-4 my-4 flex flex-1 items-center justify-center">
       <div className="w-full max-w-4xl">
         <div className="rounded-3xl bg-white p-4 shadow-xl dark:bg-black sm:p-8">
           <div className="relative mb-6 flex flex-col items-center gap-4 sm:mb-8 sm:flex-row sm:gap-8">

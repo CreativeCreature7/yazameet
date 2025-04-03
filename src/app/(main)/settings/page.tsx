@@ -169,8 +169,8 @@ export default function Settings() {
   if (!user) return null;
 
   return (
-    <div className="mx-4 mt-14 md:mt-40">
-      <Card className="mx-auto mt-6 max-w-sm">
+    <div className="mx-4 flex-1 flex items-center justify-center">
+      <Card className="mx-auto my-4 max-w-lg">
         <CardHeader>
           <CardTitle>{t("settings")}</CardTitle>
           <CardDescription>{t("update_your_profile")}</CardDescription>
