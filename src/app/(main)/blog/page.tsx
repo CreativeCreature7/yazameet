@@ -12,7 +12,7 @@ export default function BlogPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-4 mt-32">
+      <div className="mx-4 mt-4">
         <h1 className="mb-4 text-3xl font-bold tracking-tight">{t("blog")}</h1>
         <div className="grid gap-4 px-4 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
@@ -35,7 +35,7 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="mt-32 space-y-8 px-4">
+    <div className="mt-4 space-y-8 px-4">
       <h1 className="text-3xl font-bold tracking-tight">{t("blog")}</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {posts?.map((post) => (

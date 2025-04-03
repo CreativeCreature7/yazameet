@@ -3,19 +3,22 @@
 import { api } from "@/trpc/react";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
+import { enUS, he } from "date-fns/locale";
 import { CalendarIcon, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 
 export default function BlogPost({ params }: { params: { slug: string } }) {
   const t = useTranslations("Blog");
+  const locale = useLocale();
   const { data: post, isLoading } = api.blog.getBySlug.useQuery({
     slug: params.slug,
   });
 
   if (isLoading) {
     return (
-      <div className="mt-36 px-4" dir="ltr">
+      <div className="mt-4 px-4" dir="ltr">
         <div className="mx-auto max-w-2xl space-y-8">
           <div className="space-y-4">
             <div className="h-8 w-2/3 animate-pulse rounded-md bg-muted" />
@@ -39,7 +42,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div className="mt-24 sm:mt-36 px-4 sm:px-6 lg:px-8" dir="ltr">
+    <div className="mt-4 px-4 sm:px-6 lg:px-8" dir="ltr">
       <article className="mx-auto max-w-2xl space-y-6 sm:space-y-8">
         <div className="flex items-center gap-2">
           <Link
@@ -51,17 +54,19 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
           </Link>
         </div>
         <header className="space-y-2">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[60px] font-bold tracking-tight">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-[60px]">
             {post.title}
           </h1>
           <p className="flex items-center gap-2 text-muted-foreground">
             <CalendarIcon className="h-4 w-4" />
-            {format(post.createdAt, "dd MMMM yyyy")}
+            {format(post.createdAt, "dd MMMM yyyy", {
+              locale: locale === "en" ? enUS : he,
+            })}
           </p>
         </header>
         <hr className="my-6 sm:my-8" />
         <div
-          className="prose prose-neutral max-w-none dark:prose-invert prose-sm sm:prose-base lg:prose-lg"
+          className="prose prose-sm prose-neutral max-w-none dark:prose-invert sm:prose-base lg:prose-lg"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
       </article>
