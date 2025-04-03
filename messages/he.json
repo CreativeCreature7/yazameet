@@ -104,6 +104,7 @@
   "project_type": "סוג פרוייקט",
   "roles": "תפקידים",
   "update_project": "עידכון פרוייקט",
+  "delete_project": "מחק פרוייקט",
   "login_to_add_project": "הכנסו כדאי לראות ולהתחבר לפרוייקטים מ Up-Rise",
   "auth": {
     "createAccountOrLogin": "בואו נכנס ל-Yazameet",

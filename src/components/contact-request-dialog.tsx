@@ -79,10 +79,10 @@ export function ContactRequestDialog({ projectId, roles }: Props) {
   const { mutate: submitRequest, isPending } =
     api.project.submitContactRequest.useMutation({
       onSuccess: async () => {
-        setOpenDialog(false);
-        toast.success(t("contact_request_sent"));
         await utils.project.invalidate();
         form.reset();
+        setOpenDialog(false);
+        toast.success(t("contact_request_sent"));
       },
     });
 
@@ -142,8 +142,8 @@ export function ContactRequestDialog({ projectId, roles }: Props) {
     <>
       <Dialog open={openDialog} onOpenChange={() => setOpenDialog(!openDialog)}>
         <DialogTrigger asChild>
-          <Button 
-            variant="default" 
+          <Button
+            variant="default"
             onClick={(e) => {
               if (!session?.data?.user) {
                 e.preventDefault();
@@ -193,7 +193,9 @@ export function ContactRequestDialog({ projectId, roles }: Props) {
                       <FormControl>
                         <TagSelect
                           options={uniqueRoles}
-                          selectedOptions={field.value.map((role) => role.value)}
+                          selectedOptions={field.value.map(
+                            (role) => role.value,
+                          )}
                           onChange={(selected) => {
                             field.onChange(
                               selected.map((value) => ({
@@ -283,7 +285,7 @@ export function ContactRequestDialog({ projectId, roles }: Props) {
           </div>
         </DialogContent>
       </Dialog>
-      
+
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

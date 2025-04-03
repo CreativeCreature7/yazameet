@@ -76,21 +76,21 @@ export function ProjectForm({ values, id, defaultType }: props) {
   const utils = api.useUtils();
   const { mutate: createProject, isPending } = api.project.create.useMutation({
     onSuccess: async () => {
+      await utils.project.invalidate();
+      form.reset();
+      values = undefined;
       setOpenDialog(false);
       id
         ? toast.success(t("project_updated_successfully"))
         : toast.success(t("project_added_successfully"));
-      await utils.project.invalidate();
-      form.reset();
-      values = undefined;
     },
   });
 
   const { mutate: deleteProject } = api.project.delete.useMutation({
     onSuccess: async () => {
+      await utils.project.invalidate();
       setOpenDialog(false);
       toast.success(t("project_deleted_successfully"));
-      await utils.project.invalidate();
     },
   });
 
@@ -245,7 +245,7 @@ export function ProjectForm({ values, id, defaultType }: props) {
                     )}
                   />
                 )}
-                <div className="mt-4 flex justify-between">
+                <div className="mt-4 flex flex-col gap-2">
                   <LoadingButton
                     type="submit"
                     loading={isPending}
@@ -256,11 +256,11 @@ export function ProjectForm({ values, id, defaultType }: props) {
                   {id && (
                     <Button
                       type="button"
-                      variant="destructive"
-                      className="ms-2"
+                      variant="outline"
                       onClick={() => setOpenDeleteDialog(true)}
                     >
                       <TrashIcon className="h-4 w-4" />
+                      <span className="ms-2">{t("delete_project")}</span>
                     </Button>
                   )}
                 </div>

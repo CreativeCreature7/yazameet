@@ -102,6 +102,7 @@
   },
   "filter": "Filter",
   "update_project": "Update Project",
+  "delete_project": "Delete Project",
   "project_type": "Project Type",
   "roles": "Roles",
   "login_to_add_project": "Login to see Projects from Up-Rise",
