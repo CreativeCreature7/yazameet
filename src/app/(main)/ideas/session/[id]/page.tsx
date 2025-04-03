@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { AutosizeTextarea } from "@/components/ui/autosize-textarea";
+import { useTranslations } from "next-intl";
 
 // Phase duration in seconds
 const IDEATION_PHASE_DURATION = 1 * 60; // 10 minutes
@@ -30,6 +31,7 @@ export default function IdeationSession({
   const searchParams = useSearchParams();
   const sessionName = searchParams.get("name") || "Ideation Session";
   const isTeamSession = searchParams.get("team") === "true";
+  const t = useTranslations("ideas.session");
 
   const [currentPhase, setCurrentPhase] = useState<SessionPhase>("ideation");
   const [timeRemaining, setTimeRemaining] = useState(IDEATION_PHASE_DURATION);
@@ -133,8 +135,9 @@ export default function IdeationSession({
         <div>
           <h1 className="text-3xl font-bold">{sessionName}</h1>
           <p className="text-muted-foreground">
-            {isTeamSession ? "Team Session" : "Solo Session"}
-            {" • "}Session ID: {params.id}
+            {isTeamSession ? t("team_session") : t("solo_session")}
+            {" • "}
+            {t("session_id")} {params.id}
           </p>
         </div>
 
@@ -144,7 +147,9 @@ export default function IdeationSession({
               {formatTime(timeRemaining)}
             </div>
             <Badge variant="outline">
-              {currentPhase === "ideation" ? "Ideation Phase" : "Sorting Phase"}
+              {currentPhase === "ideation"
+                ? t("ideation_phase")
+                : t("sorting_phase")}
             </Badge>
           </div>
         )}
@@ -154,29 +159,28 @@ export default function IdeationSession({
       {currentPhase === "ideation" && (
         <div className="space-y-6">
           <Card className="p-6">
-            <h2 className="mb-4 text-xl font-semibold">Generate Ideas</h2>
-            <p className="mb-4">
-              You have 10 minutes to generate as many ideas as possible. Don't
-              filter or judge - just write!
-            </p>
+            <h2 className="mb-4 text-xl font-semibold">
+              {t("generate_ideas")}
+            </h2>
+            <p className="mb-4">{t("generate_ideas_description")}</p>
 
             <form onSubmit={handleAddIdea} className="flex gap-2">
               <AutosizeTextarea
                 value={newIdea}
                 onChange={(e) => setNewIdea(e.target.value)}
-                placeholder="Type your idea here..."
+                placeholder={t("idea_placeholder")}
                 className="flex-1"
               />
-              <Button type="submit">Add</Button>
+              <Button type="submit">{t("add_idea")}</Button>
             </form>
           </Card>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Ideas ({ideas.length})</h3>
+            <h3 className="text-lg font-medium">
+              {t("ideas_count")} ({ideas.length})
+            </h3>
             {ideas.length === 0 ? (
-              <p className="text-muted-foreground">
-                No ideas yet. Start adding some!
-              </p>
+              <p className="text-muted-foreground">{t("no_ideas_yet")}</p>
             ) : (
               <div className="space-y-2">
                 {ideas.map((idea) => (
@@ -194,17 +198,18 @@ export default function IdeationSession({
       {currentPhase === "sorting" && (
         <div className="space-y-6">
           <Card className="p-6">
-            <h2 className="mb-4 text-xl font-semibold">Prioritize Ideas</h2>
-            <p className="mb-4">
-              You have 5 minutes to sort all ideas from most promising to least
-              promising.
-            </p>
+            <h2 className="mb-4 text-xl font-semibold">
+              {t("prioritize_ideas")}
+            </h2>
+            <p className="mb-4">{t("prioritize_ideas_description")}</p>
           </Card>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Rank Ideas ({ideas.length})</h3>
+            <h3 className="text-lg font-medium">
+              {t("rank_ideas")} ({ideas.length})
+            </h3>
             {ideas.length === 0 ? (
-              <p className="text-muted-foreground">No ideas to rank.</p>
+              <p className="text-muted-foreground">{t("no_ideas_to_rank")}</p>
             ) : (
               <div className="space-y-2">
                 {ideas.map((idea, index) => (
@@ -246,21 +251,22 @@ export default function IdeationSession({
       {currentPhase === "selection" && (
         <div className="space-y-6">
           <Card className="p-6">
-            <h2 className="mb-4 text-xl font-semibold">Final Selection</h2>
-            <p className="mb-4">
-              Select your top 3 ideas from the sorted list, then choose the
-              final winner.
-            </p>
+            <h2 className="mb-4 text-xl font-semibold">
+              {t("final_selection")}
+            </h2>
+            <p className="mb-4">{t("final_selection_description")}</p>
           </Card>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Top Ideas</h3>
-              <Badge variant="outline">{selectedIdeas.length}/3 selected</Badge>
+              <h3 className="text-lg font-medium">{t("top_ideas")}</h3>
+              <Badge variant="outline">
+                {selectedIdeas.length}/3 {t("selected_count")}
+              </Badge>
             </div>
 
             {ideas.length === 0 ? (
-              <p className="text-muted-foreground">No ideas to select from.</p>
+              <p className="text-muted-foreground">{t("no_ideas_to_select")}</p>
             ) : (
               <div className="space-y-3">
                 {ideas.slice(0, 10).map((idea, index) => (
@@ -280,7 +286,7 @@ export default function IdeationSession({
                       <Badge variant="outline">{index + 1}</Badge>
                       <p>{idea.text}</p>
                       {selectedIdeas.includes(idea.id) && (
-                        <Badge className="ml-auto">Selected</Badge>
+                        <Badge className="ml-auto">{t("selected")}</Badge>
                       )}
                     </div>
                   </Card>
@@ -291,7 +297,7 @@ export default function IdeationSession({
 
           {selectedIdeas.length === 3 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Choose the Winner</h3>
+              <h3 className="text-lg font-medium">{t("choose_winner")}</h3>
               <div className="space-y-3">
                 {ideas
                   .filter((idea) => selectedIdeas.includes(idea.id))
@@ -303,7 +309,7 @@ export default function IdeationSession({
                           onClick={() => finalizeSelection(idea.id)}
                           size="sm"
                         >
-                          Select as Winner
+                          {t("select_as_winner")}
                         </Button>
                       </div>
                     </Card>
@@ -318,15 +324,14 @@ export default function IdeationSession({
       {currentPhase === "completed" && finalIdea && (
         <div className="space-y-6">
           <Card className="border-green-500 p-6">
-            <h2 className="mb-4 text-xl font-semibold">Session Completed!</h2>
-            <p className="mb-4">
-              You've successfully completed the ideation session and selected a
-              winning idea.
-            </p>
+            <h2 className="mb-4 text-xl font-semibold">
+              {t("session_completed")}
+            </h2>
+            <p className="mb-4">{t("session_completed_description")}</p>
           </Card>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Winning Idea</h3>
+            <h3 className="text-lg font-medium">{t("winning_idea")}</h3>
             <Card className="bg-primary/5 p-6">
               <p className="text-xl">
                 {ideas.find((idea) => idea.id === finalIdea)?.text}
@@ -335,9 +340,9 @@ export default function IdeationSession({
 
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1">
-                Download Results
+                {t("download_results")}
               </Button>
-              <Button className="flex-1">Create Project From Idea</Button>
+              <Button className="flex-1">{t("create_project")}</Button>
             </div>
           </div>
         </div>

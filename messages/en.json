@@ -153,6 +153,62 @@
   "delete": "Delete",
   "ideas": {
     "banner": "New! come up with your startup ideas and collaborate with others",
-    "click_here": "Click here to get started"
+    "click_here": "Click here to get started",
+    "title": "Ideas",
+    "description": "Start an ideation session solo or with your team to generate and prioritize ideas.",
+    "start_new_session": "Start New Ideation Session",
+    "view_past_sessions": "View Past Sessions",
+    "new_session": {
+      "title": "New Ideation Session",
+      "session_name": "Session Name",
+      "session_name_placeholder": "Enter a name for this ideation session",
+      "team_session": "Team Session",
+      "team_members": "Team Members (emails, comma-separated)",
+      "team_members_placeholder": "teammate1@example.com, teammate2@example.com",
+      "team_members_help": "Team members will receive an invitation to join this session.",
+      "start_session": "Start Session"
+    },
+    "history": {
+      "title": "Past Ideation Sessions",
+      "empty_state": "You don't have any past ideation sessions yet.",
+      "start_first_session": "Start Your First Session",
+      "team_session": "Team Session",
+      "solo_session": "Solo Session",
+      "participants": "participants",
+      "ideas_count": "ideas",
+      "winning_idea": "Winning Idea:",
+      "view_details": "View Details",
+      "export_results": "Export Results"
+    },
+    "session": {
+      "team_session": "Team Session",
+      "solo_session": "Solo Session",
+      "session_id": "Session ID:",
+      "ideation_phase": "Ideation Phase",
+      "sorting_phase": "Sorting Phase",
+      "generate_ideas": "Generate Ideas",
+      "generate_ideas_description": "You have 10 minutes to generate as many ideas as possible. Don't filter or judge - just write!",
+      "idea_placeholder": "Type your idea here...",
+      "add_idea": "Add",
+      "ideas_count": "Ideas",
+      "no_ideas_yet": "No ideas yet. Start adding some!",
+      "prioritize_ideas": "Prioritize Ideas",
+      "prioritize_ideas_description": "You have 5 minutes to sort all ideas from most promising to least promising.",
+      "rank_ideas": "Rank Ideas",
+      "no_ideas_to_rank": "No ideas to rank.",
+      "final_selection": "Final Selection",
+      "final_selection_description": "Select your top 3 ideas from the sorted list, then choose the final winner.",
+      "top_ideas": "Top Ideas",
+      "selected": "Selected",
+      "selected_count": "selected",
+      "no_ideas_to_select": "No ideas to select from.",
+      "choose_winner": "Choose the Winner",
+      "select_as_winner": "Select as Winner",
+      "session_completed": "Session Completed!",
+      "session_completed_description": "You've successfully completed the ideation session and selected a winning idea.",
+      "winning_idea": "Winning Idea",
+      "download_results": "Download Results",
+      "create_project": "Create Project From Idea"
+    }
   }
 }

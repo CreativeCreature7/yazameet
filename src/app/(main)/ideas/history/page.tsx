@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 
 // In a real app, this would come from an API
 const MOCK_SESSIONS = [
@@ -40,23 +41,22 @@ const MOCK_SESSIONS = [
 
 export default function IdeationHistory() {
   const [sessions] = useState(MOCK_SESSIONS);
+  const t = useTranslations("ideas.history");
 
   return (
     <div className="container py-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Past Ideation Sessions</h1>
+        <h1 className="text-3xl font-bold">{t("title")}</h1>
         <Button asChild>
-          <Link href="/ideas/new">New Session</Link>
+          <Link href="/ideas/new">{t("new_session", { ns: "ideas" })}</Link>
         </Button>
       </div>
 
       {sessions.length === 0 ? (
         <Card className="p-6 text-center">
-          <p className="mb-4 text-muted-foreground">
-            You don't have any past ideation sessions yet.
-          </p>
+          <p className="mb-4 text-muted-foreground">{t("empty_state")}</p>
           <Button asChild>
-            <Link href="/ideas/new">Start Your First Session</Link>
+            <Link href="/ideas/new">{t("start_first_session")}</Link>
           </Button>
         </Card>
       ) : (
@@ -69,15 +69,17 @@ export default function IdeationHistory() {
                   <p className="text-muted-foreground">
                     {new Date(session.date).toLocaleDateString()} •
                     {session.teamSession
-                      ? ` Team Session (${session.participants} participants)`
-                      : " Solo Session"}
+                      ? ` ${t("team_session")} (${session.participants} ${t("participants")})`
+                      : ` ${t("solo_session")}`}
                   </p>
                 </div>
-                <Badge>{session.ideas} ideas</Badge>
+                <Badge>
+                  {session.ideas} {t("ideas_count")}
+                </Badge>
               </div>
 
               <div className="mt-4 border-t pt-4">
-                <p className="font-medium">Winning Idea:</p>
+                <p className="font-medium">{t("winning_idea")}</p>
                 <p className="mt-1 text-muted-foreground">
                   {session.winningIdea}
                 </p>
@@ -86,11 +88,11 @@ export default function IdeationHistory() {
               <div className="mt-4 flex gap-2">
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/ideas/session/${session.id}`}>
-                    View Details
+                    {t("view_details")}
                   </Link>
                 </Button>
                 <Button variant="ghost" size="sm">
-                  Export Results
+                  {t("export_results")}
                 </Button>
               </div>
             </Card>
