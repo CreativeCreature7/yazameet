@@ -11,11 +11,19 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { LoginModal } from "@/components/auth/login-modal";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 
 export function Header() {
   const t = useTranslations();
   const { status } = useSession();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: "/", label: "projects" },
+    { href: "/ideas", label: "ideas.title" },
+    { href: "/blog", label: "blog" },
+  ];
 
   return (
     <>
@@ -47,6 +55,26 @@ export function Header() {
             alt="Logo"
           />
         </Link>
+
+        <div className="col-span-12 flex justify-center border-t py-3 lg:col-span-12">
+          <nav className="flex space-x-6">
+            {navLinks.map((link) => {
+              const isActive =
+                pathname === link.href || pathname.startsWith(`${link.href}/`);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  {t(link.label)}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
       </div>
 
       <LoginModal

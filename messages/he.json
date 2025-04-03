@@ -161,12 +161,14 @@
     "new_session": {
       "title": "סשן רעיונות חדש",
       "session_name": "שם הסשן",
+      "session_name_required": "שם הסשן הוא שדה חובה",
       "session_name_placeholder": "הכנס/י שם לסשן הרעיונות",
       "team_session": "סשן צוותי",
       "team_members": "חברי צוות (אימיילים, מופרדים בפסיקים)",
       "team_members_placeholder": "teammate1@example.com, teammate2@example.com",
       "team_members_help": "חברי הצוות יקבלו הזמנה להצטרף לסשן זה.",
-      "start_session": "התחל/י סשן"
+      "start_session": "התחל/י סשן",
+      "session_created": "הסשן נוצר בהצלחה"
     },
     "history": {
       "title": "סשני רעיונות קודמים",
@@ -209,7 +211,10 @@
       "session_completed_description": "השלמת בהצלחה את סשן הרעיונות ובחרת רעיון מנצח.",
       "winning_idea": "רעיון מנצח",
       "download_results": "הורד תוצאות",
-      "create_project": "צור פרויקט מהרעיון"
+      "create_project": "צור פרויקט מהרעיון",
+      "winner_selected": "הרעיון המנצח נבחר בהצלחה!",
+      "session_not_found": "סשן הרעיונות לא נמצא",
+      "back_to_history": "חזרה להיסטוריה"
     }
   }
 }

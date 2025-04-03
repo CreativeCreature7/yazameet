@@ -1,58 +1,136 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { AutosizeTextarea } from "@/components/ui/autosize-textarea";
 import { useTranslations } from "next-intl";
+import { api } from "@/trpc/react";
+import { IdeationPhase } from "@prisma/client";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 
 // Phase duration in seconds
-const IDEATION_PHASE_DURATION = 1 * 60; // 10 minutes
-const SORTING_PHASE_DURATION = 1 * 60; // 5 minutes
+const IDEATION_PHASE_DURATION = 1 * 20; // 20 seconds
+const SORTING_PHASE_DURATION = 1 * 20; // 20 seconds
 
-type Idea = {
-  id: string;
-  text: string;
-  createdBy: string;
-  createdAt: Date;
-  rank?: number;
-};
-
-type SessionPhase = "ideation" | "sorting" | "selection" | "completed";
+// Schema for adding a new idea
+const newIdeaSchema = z.object({
+  text: z.string().min(1, "Idea text is required"),
+});
 
 export default function IdeationSession({
   params,
 }: {
   params: { id: string };
 }) {
-  const searchParams = useSearchParams();
-  const sessionName = searchParams.get("name") || "Ideation Session";
-  const isTeamSession = searchParams.get("team") === "true";
+  const router = useRouter();
   const t = useTranslations("ideas.session");
-
-  const [currentPhase, setCurrentPhase] = useState<SessionPhase>("ideation");
   const [timeRemaining, setTimeRemaining] = useState(IDEATION_PHASE_DURATION);
-  const [ideas, setIdeas] = useState<Idea[]>([]);
-  const [newIdea, setNewIdea] = useState("");
-  const [username] = useState("Current User"); // Would come from auth
   const [selectedIdeas, setSelectedIdeas] = useState<string[]>([]);
-  const [finalIdea, setFinalIdea] = useState<string | null>(null);
+
+  // Fetch session data
+  const {
+    data: session,
+    isLoading,
+    refetch,
+  } = api.ideation.getById.useQuery(
+    {
+      id: params.id,
+    },
+    {
+      onError: (error) => {
+        toast.error(error.message);
+        router.push("/ideas/history");
+      },
+    },
+  );
+
+  // Setup mutations
+  const { mutate: addIdea } = api.ideation.addIdea.useMutation({
+    onSuccess: () => {
+      form.reset({ text: "" });
+      void refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const { mutate: updatePhase } = api.ideation.updatePhase.useMutation({
+    onSuccess: () => {
+      void refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const { mutate: updateIdeaRanks } = api.ideation.updateIdeaRanks.useMutation({
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const { mutate: selectWinningIdea } =
+    api.ideation.selectWinningIdea.useMutation({
+      onSuccess: () => {
+        void refetch();
+        toast.success(t("winner_selected"));
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    });
+
+  // New idea form
+  const form = useForm<z.infer<typeof newIdeaSchema>>({
+    resolver: zodResolver(newIdeaSchema),
+    defaultValues: {
+      text: "",
+    },
+  });
 
   // Handle timer
   useEffect(() => {
+    if (
+      !session ||
+      (session.phase !== IdeationPhase.IDEATION &&
+        session.phase !== IdeationPhase.SORTING)
+    ) {
+      return;
+    }
+
+    const initialTime =
+      session.phase === IdeationPhase.IDEATION
+        ? IDEATION_PHASE_DURATION
+        : SORTING_PHASE_DURATION;
+
+    setTimeRemaining(initialTime);
+
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
+
           // Move to next phase
-          if (currentPhase === "ideation") {
-            setCurrentPhase("sorting");
+          if (session.phase === IdeationPhase.IDEATION) {
+            updatePhase({
+              sessionId: session.id,
+              phase: IdeationPhase.SORTING,
+            });
             return SORTING_PHASE_DURATION;
-          } else if (currentPhase === "sorting") {
-            setCurrentPhase("selection");
+          } else if (session.phase === IdeationPhase.SORTING) {
+            updatePhase({
+              sessionId: session.id,
+              phase: IdeationPhase.SELECTION,
+            });
           }
           return 0;
         }
@@ -61,7 +139,7 @@ export default function IdeationSession({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentPhase]);
+  }, [session?.phase, session?.id, updatePhase]);
 
   // Format time remaining
   const formatTime = useCallback((seconds: number) => {
@@ -71,41 +149,48 @@ export default function IdeationSession({
   }, []);
 
   // Add new idea
-  const handleAddIdea = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newIdea.trim() && currentPhase === "ideation") {
-      const idea: Idea = {
-        id: Date.now().toString(),
-        text: newIdea.trim(),
-        createdBy: username,
-        createdAt: new Date(),
-      };
-      setIdeas((prev) => [...prev, idea]);
-      setNewIdea("");
-    }
-  };
+  function onSubmitNewIdea(values: z.infer<typeof newIdeaSchema>) {
+    if (!session) return;
+
+    addIdea({
+      text: values.text,
+      sessionId: session.id,
+    });
+  }
 
   // Handle idea sorting
   const handleIdeaRank = (ideaId: string, direction: "up" | "down") => {
-    setIdeas((prev) => {
-      const newIdeas = [...prev];
-      const ideaIndex = newIdeas.findIndex((idea) => idea.id === ideaId);
+    if (!session || !session.ideas) return;
 
-      if (ideaIndex === -1) return prev;
+    // Create a copy of the ideas array
+    const ideasCopy = [...session.ideas];
+    const ideaIndex = ideasCopy.findIndex((idea) => idea.id === ideaId);
 
-      const swapIndex =
-        direction === "up"
-          ? Math.max(0, ideaIndex - 1)
-          : Math.min(newIdeas.length - 1, ideaIndex + 1);
+    if (ideaIndex === -1) return;
 
-      if (swapIndex === ideaIndex) return prev;
+    const swapIndex =
+      direction === "up"
+        ? Math.max(0, ideaIndex - 1)
+        : Math.min(ideasCopy.length - 1, ideaIndex + 1);
 
-      // Swap ideas with type assertions
-      const temp = newIdeas[ideaIndex] as Idea;
-      newIdeas[ideaIndex] = newIdeas[swapIndex] as Idea;
-      newIdeas[swapIndex] = temp;
+    if (swapIndex === ideaIndex) return;
 
-      return newIdeas;
+    // Swap items
+    [ideasCopy[ideaIndex], ideasCopy[swapIndex]] = [
+      ideasCopy[swapIndex],
+      ideasCopy[ideaIndex],
+    ];
+
+    // Update ranks
+    const updatedIdeas = ideasCopy.map((idea, index) => ({
+      id: idea.id,
+      rank: index,
+    }));
+
+    // Optimistically update the UI (handled by refetch in the success callback)
+    updateIdeaRanks({
+      sessionId: session.id,
+      ideas: updatedIdeas,
     });
   };
 
@@ -125,29 +210,70 @@ export default function IdeationSession({
 
   // Finalize selection
   const finalizeSelection = (ideaId: string) => {
-    setFinalIdea(ideaId);
-    setCurrentPhase("completed");
+    if (!session) return;
+
+    selectWinningIdea({
+      sessionId: session.id,
+      ideaId,
+    });
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="container py-8">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <Skeleton className="mb-2 h-8 w-48" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+          <Skeleton className="h-8 w-24" />
+        </div>
+        <Card className="p-6">
+          <Skeleton className="mb-4 h-6 w-32" />
+          <Skeleton className="mb-4 h-4 w-full" />
+          <div className="flex gap-2">
+            <Skeleton className="h-24 flex-1" />
+            <Skeleton className="h-10 w-20" />
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="container py-8">
+        <Card className="p-6 text-center">
+          <p className="text-muted-foreground">{t("session_not_found")}</p>
+          <Button asChild className="mt-4">
+            <a href="/ideas/history">{t("back_to_history")}</a>
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{sessionName}</h1>
+          <h1 className="text-3xl font-bold">{session.name}</h1>
           <p className="text-muted-foreground">
-            {isTeamSession ? t("team_session") : t("solo_session")}
+            {session.isTeam ? t("team_session") : t("solo_session")}
             {" • "}
-            {t("session_id")} {params.id}
+            {t("session_id")} {session.id}
           </p>
         </div>
 
-        {(currentPhase === "ideation" || currentPhase === "sorting") && (
+        {(session.phase === IdeationPhase.IDEATION ||
+          session.phase === IdeationPhase.SORTING) && (
           <div className="text-right">
             <div className="mb-1 font-mono text-3xl">
               {formatTime(timeRemaining)}
             </div>
-            <Badge variant="outline">
-              {currentPhase === "ideation"
+            <Badge className="border bg-transparent text-foreground">
+              {session.phase === IdeationPhase.IDEATION
                 ? t("ideation_phase")
                 : t("sorting_phase")}
             </Badge>
@@ -156,7 +282,7 @@ export default function IdeationSession({
       </div>
 
       {/* Ideation Phase */}
-      {currentPhase === "ideation" && (
+      {session.phase === IdeationPhase.IDEATION && (
         <div className="space-y-6">
           <Card className="p-6">
             <h2 className="mb-4 text-xl font-semibold">
@@ -164,26 +290,40 @@ export default function IdeationSession({
             </h2>
             <p className="mb-4">{t("generate_ideas_description")}</p>
 
-            <form onSubmit={handleAddIdea} className="flex gap-2">
-              <AutosizeTextarea
-                value={newIdea}
-                onChange={(e) => setNewIdea(e.target.value)}
-                placeholder={t("idea_placeholder")}
-                className="flex-1"
-              />
-              <Button type="submit">{t("add_idea")}</Button>
-            </form>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmitNewIdea)}
+                className="flex gap-2"
+              >
+                <FormField
+                  control={form.control}
+                  name="text"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <AutosizeTextarea
+                          placeholder={t("idea_placeholder")}
+                          className="flex-1"
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit">{t("add_idea")}</Button>
+              </form>
+            </Form>
           </Card>
 
           <div className="space-y-4">
             <h3 className="text-lg font-medium">
-              {t("ideas_count")} ({ideas.length})
+              {t("ideas_count")} ({session.ideas.length})
             </h3>
-            {ideas.length === 0 ? (
+            {session.ideas.length === 0 ? (
               <p className="text-muted-foreground">{t("no_ideas_yet")}</p>
             ) : (
               <div className="space-y-2">
-                {ideas.map((idea) => (
+                {session.ideas.map((idea) => (
                   <Card key={idea.id} className="p-4">
                     <p>{idea.text}</p>
                   </Card>
@@ -195,7 +335,7 @@ export default function IdeationSession({
       )}
 
       {/* Sorting Phase */}
-      {currentPhase === "sorting" && (
+      {session.phase === IdeationPhase.SORTING && (
         <div className="space-y-6">
           <Card className="p-6">
             <h2 className="mb-4 text-xl font-semibold">
@@ -206,19 +346,21 @@ export default function IdeationSession({
 
           <div className="space-y-4">
             <h3 className="text-lg font-medium">
-              {t("rank_ideas")} ({ideas.length})
+              {t("rank_ideas")} ({session.ideas.length})
             </h3>
-            {ideas.length === 0 ? (
+            {session.ideas.length === 0 ? (
               <p className="text-muted-foreground">{t("no_ideas_to_rank")}</p>
             ) : (
               <div className="space-y-2">
-                {ideas.map((idea, index) => (
+                {session.ideas.map((idea, index) => (
                   <Card
                     key={idea.id}
                     className="flex items-center justify-between p-4"
                   >
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline">{index + 1}</Badge>
+                      <Badge className="border bg-transparent text-foreground">
+                        {index + 1}
+                      </Badge>
                       <p>{idea.text}</p>
                     </div>
                     <div className="flex gap-1">
@@ -234,7 +376,7 @@ export default function IdeationSession({
                         variant="outline"
                         size="sm"
                         onClick={() => handleIdeaRank(idea.id, "down")}
-                        disabled={index === ideas.length - 1}
+                        disabled={index === session.ideas.length - 1}
                       >
                         ↓
                       </Button>
@@ -248,7 +390,7 @@ export default function IdeationSession({
       )}
 
       {/* Selection Phase */}
-      {currentPhase === "selection" && (
+      {session.phase === IdeationPhase.SELECTION && (
         <div className="space-y-6">
           <Card className="p-6">
             <h2 className="mb-4 text-xl font-semibold">
@@ -260,16 +402,16 @@ export default function IdeationSession({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium">{t("top_ideas")}</h3>
-              <Badge variant="outline">
+              <Badge className="border bg-transparent text-foreground">
                 {selectedIdeas.length}/3 {t("selected_count")}
               </Badge>
             </div>
 
-            {ideas.length === 0 ? (
+            {session.ideas.length === 0 ? (
               <p className="text-muted-foreground">{t("no_ideas_to_select")}</p>
             ) : (
               <div className="space-y-3">
-                {ideas.slice(0, 10).map((idea, index) => (
+                {session.ideas.slice(0, 10).map((idea, index) => (
                   <Card
                     key={idea.id}
                     className={`cursor-pointer p-4 ${
@@ -283,10 +425,14 @@ export default function IdeationSession({
                     }
                   >
                     <div className="flex items-center gap-3">
-                      <Badge variant="outline">{index + 1}</Badge>
+                      <Badge className="border bg-transparent text-foreground">
+                        {index + 1}
+                      </Badge>
                       <p>{idea.text}</p>
                       {selectedIdeas.includes(idea.id) && (
-                        <Badge className="ml-auto">{t("selected")}</Badge>
+                        <Badge className="bg-primary text-primary-foreground">
+                          {t("selected")}
+                        </Badge>
                       )}
                     </div>
                   </Card>
@@ -299,7 +445,7 @@ export default function IdeationSession({
             <div className="space-y-4">
               <h3 className="text-lg font-medium">{t("choose_winner")}</h3>
               <div className="space-y-3">
-                {ideas
+                {session.ideas
                   .filter((idea) => selectedIdeas.includes(idea.id))
                   .map((idea) => (
                     <Card key={idea.id} className="p-4">
@@ -321,7 +467,7 @@ export default function IdeationSession({
       )}
 
       {/* Completed Phase */}
-      {currentPhase === "completed" && finalIdea && (
+      {session.phase === IdeationPhase.COMPLETED && session.winningIdea && (
         <div className="space-y-6">
           <Card className="border-green-500 p-6">
             <h2 className="mb-4 text-xl font-semibold">
@@ -333,9 +479,7 @@ export default function IdeationSession({
           <div className="space-y-4">
             <h3 className="text-lg font-medium">{t("winning_idea")}</h3>
             <Card className="bg-primary/5 p-6">
-              <p className="text-xl">
-                {ideas.find((idea) => idea.id === finalIdea)?.text}
-              </p>
+              <p className="text-xl">{session.winningIdea}</p>
             </Card>
 
             <div className="flex gap-3">

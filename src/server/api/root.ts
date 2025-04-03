@@ -5,6 +5,7 @@ import { profileRouter } from "@/server/api/routers/profile";
 import { mediaRouter } from "@/server/api/routers/media";
 import { blogRouter } from "@/server/api/routers/blog";
 import { adminRouter } from "@/server/api/routers/admin";
+import { ideationRouter } from "@/server/api/routers/ideation";
 
 /**
  * This is the primary router for your server.
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   media: mediaRouter,
   blog: blogRouter,
   admin: adminRouter,
+  ideation: ideationRouter,
 });
 
 // export type definition of API

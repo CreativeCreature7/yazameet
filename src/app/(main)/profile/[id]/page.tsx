@@ -84,18 +84,11 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             transition={{ delay: 0.5 }}
             className="flex flex-col items-center sm:items-start"
           >
-            <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
-              {profile.roles.map((role, index) => (
-                <motion.div
-                  key={role}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                >
-                  <Badge variant="secondary" className="text-sm">
-                    {t(role)}
-                  </Badge>
-                </motion.div>
+            <div className="flex flex-wrap gap-1.5">
+              {profile.roles.map((role) => (
+                <Badge className="bg-secondary text-sm text-secondary-foreground">
+                  {t(role)}
+                </Badge>
               ))}
             </div>
           </motion.div>
@@ -120,7 +113,7 @@ function ProfileSkeleton() {
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
+          <div className="flex flex-wrap gap-1.5">
             <Skeleton className="h-6 w-24" />
             <Skeleton className="h-6 w-24" />
             <Skeleton className="h-6 w-24" />

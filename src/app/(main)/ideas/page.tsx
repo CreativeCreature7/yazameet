@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-export default function IdeasPage() {
-  const t = useTranslations("ideas");
+export default async function IdeasPage() {
+  const t = await getTranslations("ideas");
 
   return (
     <div className="container py-8">

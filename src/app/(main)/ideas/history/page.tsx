@@ -6,42 +6,31 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from "next-intl";
-
-// In a real app, this would come from an API
-const MOCK_SESSIONS = [
-  {
-    id: "12345",
-    name: "Q2 Marketing Campaign",
-    date: "2023-04-15",
-    teamSession: true,
-    participants: 4,
-    ideas: 42,
-    winningIdea:
-      "Interactive social media challenge with user-generated content",
-  },
-  {
-    id: "12346",
-    name: "New Product Features",
-    date: "2023-04-10",
-    teamSession: true,
-    participants: 3,
-    ideas: 31,
-    winningIdea: "AI-powered personalization for each user",
-  },
-  {
-    id: "12347",
-    name: "Website Redesign",
-    date: "2023-04-05",
-    teamSession: false,
-    participants: 1,
-    ideas: 15,
-    winningIdea: "Minimalist design with focused user flows",
-  },
-];
+import { api } from "@/trpc/react";
+import { format } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function IdeationHistory() {
-  const [sessions] = useState(MOCK_SESSIONS);
   const t = useTranslations("ideas.history");
+
+  // Fetch sessions using tRPC
+  const { data: sessions, isLoading } = api.ideation.getUserSessions.useQuery();
+
+  // Create a function to render session status based on phase
+  const getSessionStatusBadge = (phase: string) => {
+    switch (phase) {
+      case "COMPLETED":
+        return <Badge className="bg-green-500">Completed</Badge>;
+      case "SELECTION":
+        return <Badge className="bg-yellow-500">Final Selection</Badge>;
+      case "SORTING":
+        return <Badge className="bg-blue-500">Sorting Ideas</Badge>;
+      case "IDEATION":
+        return <Badge>In Progress</Badge>;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="container py-8">
@@ -54,7 +43,31 @@ export default function IdeationHistory() {
         </Button>
       </div>
 
-      {sessions.length === 0 ? (
+      {isLoading ? (
+        // Loading state
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="p-6">
+              <div className="mb-2 flex items-start justify-between">
+                <div>
+                  <Skeleton className="mb-2 h-6 w-48" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+                <Skeleton className="h-6 w-20" />
+              </div>
+              <div className="mt-4 border-t pt-4">
+                <Skeleton className="mb-2 h-4 w-24" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+              <div className="mt-4 flex gap-2">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : sessions?.length === 0 ? (
+        // Empty state
         <Card className="p-6 text-center">
           <p className="mb-4 text-muted-foreground">{t("empty_state")}</p>
           <Button asChild>
@@ -62,30 +75,36 @@ export default function IdeationHistory() {
           </Button>
         </Card>
       ) : (
+        // Sessions list
         <div className="space-y-4">
-          {sessions.map((session) => (
+          {sessions?.map((session) => (
             <Card key={session.id} className="p-6">
               <div className="mb-2 flex items-start justify-between">
                 <div>
                   <h2 className="text-xl font-semibold">{session.name}</h2>
                   <p className="text-muted-foreground">
-                    {new Date(session.date).toLocaleDateString()} •
-                    {session.teamSession
-                      ? ` ${t("team_session")} (${session.participants} ${t("participants")})`
+                    {format(new Date(session.createdAt), "PPP")} •
+                    {session.isTeam
+                      ? ` ${t("team_session")}`
                       : ` ${t("solo_session")}`}
                   </p>
                 </div>
-                <Badge>
-                  {session.ideas} {t("ideas_count")}
-                </Badge>
+                <div className="flex flex-col items-end gap-2">
+                  <Badge>
+                    {session.ideas.length} {t("ideas_count")}
+                  </Badge>
+                  {getSessionStatusBadge(session.phase)}
+                </div>
               </div>
 
-              <div className="mt-4 border-t pt-4">
-                <p className="font-medium">{t("winning_idea")}</p>
-                <p className="mt-1 text-muted-foreground">
-                  {session.winningIdea}
-                </p>
-              </div>
+              {session.phase === "COMPLETED" && session.winningIdea && (
+                <div className="mt-4 border-t pt-4">
+                  <p className="font-medium">{t("winning_idea")}</p>
+                  <p className="mt-1 text-muted-foreground">
+                    {session.winningIdea}
+                  </p>
+                </div>
+              )}
 
               <div className="mt-4 flex gap-2">
                 <Button asChild variant="outline" size="sm">
@@ -93,9 +112,11 @@ export default function IdeationHistory() {
                     {t("view_details")}
                   </Link>
                 </Button>
-                <Button variant="ghost" size="sm">
-                  {t("export_results")}
-                </Button>
+                {session.phase === "COMPLETED" && (
+                  <Button variant="ghost" size="sm">
+                    {t("export_results")}
+                  </Button>
+                )}
               </div>
             </Card>
           ))}

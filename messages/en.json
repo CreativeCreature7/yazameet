@@ -161,12 +161,14 @@
     "new_session": {
       "title": "New Ideation Session",
       "session_name": "Session Name",
+      "session_name_required": "Session name is required",
       "session_name_placeholder": "Enter a name for this ideation session",
       "team_session": "Team Session",
       "team_members": "Team Members (emails, comma-separated)",
       "team_members_placeholder": "teammate1@example.com, teammate2@example.com",
       "team_members_help": "Team members will receive an invitation to join this session.",
-      "start_session": "Start Session"
+      "start_session": "Start Session",
+      "session_created": "Session created successfully"
     },
     "history": {
       "title": "Past Ideation Sessions",
@@ -209,7 +211,10 @@
       "session_completed_description": "You've successfully completed the ideation session and selected a winning idea.",
       "winning_idea": "Winning Idea",
       "download_results": "Download Results",
-      "create_project": "Create Project From Idea"
+      "create_project": "Create Project From Idea",
+      "winner_selected": "Winner selected successfully!",
+      "session_not_found": "Ideation session not found",
+      "back_to_history": "Back to History"
     }
   }
 }
