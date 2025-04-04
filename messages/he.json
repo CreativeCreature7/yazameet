@@ -204,7 +204,7 @@
       "rank_ideas": "דרג/י רעיונות",
       "no_ideas_to_rank": "אין רעיונות לדירוג.",
       "final_selection": "בחירה סופית",
-      "final_selection_description": "בחר/י את 3 הרעיונות המובילים מהרשימה הממוינת, ואז בחר/י את המנצח הסופי.",
+      "final_selection_description": "בחר/י את הרעיון המוביל ביותר מהרשימה הממוינת.",
       "top_ideas": "רעיונות מובילים",
       "selected": "נבחר",
       "selected_count": "נבחרו",
@@ -219,10 +219,22 @@
       "winner_selected": "הרעיון המנצח נבחר בהצלחה!",
       "session_not_found": "סשן הרעיונות לא נמצא",
       "back_to_history": "חזרה להיסטוריה",
+      "skip_to_next_phase": "דלג/י לשלב הבא",
       "go_to_next_phase": "עבור לשלב הבא",
+      "go_to_previous_phase": "חזור אחורה",
+      "returned_to_previous_phase": "חזרת לשלב הקודם",
       "must_select_winner": "עליך לבחור מנצח לפני השלמת הסשן",
       "ai_suggestions": "הצעות בינה מלאכותית",
-      "based_on_session": "על פי סשן"
+      "selection_phase": "שלב הבחירה",
+      "completed_phase": "הושלם",
+      "based_on_session": "מבוסס על סשן רעיונות",
+      "skipped_to_next_phase": "עברת לשלב הבא",
+      "time_up_title": "נגמר הזמן!",
+      "unsaved_idea_prompt": "יש לך רעיון שלא נשמר. האם ברצונך להוסיף אותו לפני המעבר לשלב הבא?",
+      "submit_and_continue": "שמור והמשך",
+      "discard_and_continue": "ותר והמשך",
+      "idea_added_success": "הרעיון נוסף בהצלחה!",
+      "idea_add_error": "לא ניתן להוסיף את הרעיון. אנא נסה שוב."
     }
   }
 }

@@ -34,10 +34,29 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Sparkles } from "lucide-react";
+import {
+  GripVertical,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Phase duration in seconds
-const IDEATION_PHASE_DURATION = 10 * 60; // 10 minutes
+const IDEATION_PHASE_DURATION = 10 * 2; // 10 minutes
 const SORTING_PHASE_DURATION = 3 * 60; // 3 minutes
 
 // Define the Idea interface to match the session.ideas structure
@@ -119,6 +138,8 @@ export default function IdeationSession({
   const [isDragging, setIsDragging] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
   const [isLoadingAiSuggestions, setIsLoadingAiSuggestions] = useState(false);
+  const [showSubmitReminderDialog, setShowSubmitReminderDialog] =
+    useState(false);
 
   // Setup sensors for drag and drop
   const sensors = useSensors(
@@ -191,7 +212,6 @@ export default function IdeationSession({
     api.ideation.selectWinningIdea.useMutation({
       onSuccess: () => {
         void refetch();
-        toast.success(t("winner_selected"));
       },
       onError: (error) => {
         toast.error(error.message);
@@ -228,8 +248,23 @@ export default function IdeationSession({
         if (prev <= 1) {
           clearInterval(timer);
 
-          // Move to next phase
-          if (session.phase === IdeationPhase.IDEATION) {
+          // Check if there's unsaved text in the ideation form
+          if (
+            session.phase === IdeationPhase.IDEATION &&
+            form.getValues().text.trim().length > 0
+          ) {
+            // Show confirmation dialog
+            setShowSubmitReminderDialog(true);
+
+            // Don't auto-advance until user makes a choice
+            return 0;
+          }
+
+          // Only auto-advance if not showing the dialog
+          if (
+            session.phase === IdeationPhase.IDEATION &&
+            !showSubmitReminderDialog
+          ) {
             updatePhase({
               sessionId: session.id,
               phase: IdeationPhase.SORTING,
@@ -248,7 +283,13 @@ export default function IdeationSession({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [session?.phase, session?.id, updatePhase]);
+  }, [
+    session?.phase,
+    session?.id,
+    updatePhase,
+    form,
+    showSubmitReminderDialog,
+  ]);
 
   // Format time remaining
   const formatTime = useCallback((seconds: number) => {
@@ -256,6 +297,65 @@ export default function IdeationSession({
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   }, []);
+
+  // Function to handle submitting the remaining idea and moving to next phase
+  const handleSubmitRemainingIdea = () => {
+    if (!session) return;
+
+    // Submit the idea
+    const text = form.getValues().text;
+    if (text.trim()) {
+      // Use a local flag to track if the idea was added successfully
+      let ideaAddedSuccessfully = false;
+
+      // Add the idea first
+      addIdea(
+        {
+          text,
+          sessionId: session.id,
+        },
+        {
+          onSuccess: () => {
+            ideaAddedSuccessfully = true;
+            toast.success(t("idea_added_success"));
+
+            // Close dialog
+            setShowSubmitReminderDialog(false);
+
+            // Move to next phase after idea is successfully added
+            updatePhase({
+              sessionId: session.id,
+              phase: IdeationPhase.SORTING,
+            });
+          },
+        },
+      );
+    } else {
+      // No idea to submit, just close and move on
+      setShowSubmitReminderDialog(false);
+      updatePhase({
+        sessionId: session.id,
+        phase: IdeationPhase.SORTING,
+      });
+    }
+  };
+
+  // Function to skip without submitting the idea
+  const handleSkipRemainingIdea = () => {
+    if (!session) return;
+
+    // Close dialog
+    setShowSubmitReminderDialog(false);
+
+    // Reset form
+    form.reset();
+
+    // Move to next phase
+    updatePhase({
+      sessionId: session.id,
+      phase: IdeationPhase.SORTING,
+    });
+  };
 
   // Add new idea
   function onSubmitNewIdea(values: z.infer<typeof newIdeaSchema>) {
@@ -345,8 +445,28 @@ export default function IdeationSession({
       sessionId: session.id,
       phase: nextPhase,
     });
+  };
 
-    toast.success(t("skipped_to_next_phase"));
+  // Go back to previous phase
+  const goToPreviousPhase = () => {
+    if (!session) return;
+
+    let previousPhase;
+
+    if (session.phase === IdeationPhase.SORTING) {
+      previousPhase = IdeationPhase.IDEATION;
+    } else if (session.phase === IdeationPhase.SELECTION) {
+      previousPhase = IdeationPhase.SORTING;
+    } else if (session.phase === IdeationPhase.COMPLETED) {
+      previousPhase = IdeationPhase.SELECTION;
+    } else {
+      return; // Already at the first phase (IDEATION)
+    }
+
+    updatePhase({
+      sessionId: session.id,
+      phase: previousPhase,
+    });
   };
 
   // Generate AI suggestions
@@ -532,24 +652,61 @@ export default function IdeationSession({
         </div>
 
         {(session.phase === IdeationPhase.IDEATION ||
-          session.phase === IdeationPhase.SORTING) && (
-          <div className="text-right">
+          session.phase === IdeationPhase.SORTING ||
+          session.phase === IdeationPhase.SELECTION ||
+          session.phase === IdeationPhase.COMPLETED) && (
+          <div className="text-center">
             <div className="mb-1 font-mono text-3xl">
-              {formatTime(timeRemaining)}
+              {session.phase !== IdeationPhase.COMPLETED &&
+                formatTime(timeRemaining)}
             </div>
             <div className="flex flex-col gap-2">
               <Badge className="border bg-transparent text-foreground">
                 {session.phase === IdeationPhase.IDEATION
                   ? t("ideation_phase")
-                  : t("sorting_phase")}
+                  : session.phase === IdeationPhase.SORTING
+                    ? t("sorting_phase")
+                    : session.phase === IdeationPhase.SELECTION
+                      ? t("selection_phase")
+                      : t("completed_phase")}
               </Badge>
-              <Button
-                size="sm"
-                onClick={skipToNextPhase}
-                className="mt-2"
-              >
-                {t("go_to_next_phase")}
-              </Button>
+              <div className="flex items-center justify-center gap-2">
+                <TooltipProvider>
+                  {session.phase !== IdeationPhase.IDEATION && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={goToPreviousPhase}
+                          className="h-8 w-8"
+                        >
+                          <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("go_to_previous_phase")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {session.phase !== IdeationPhase.COMPLETED && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="icon"
+                          onClick={skipToNextPhase}
+                          className="h-8 w-8"
+                        >
+                          <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("go_to_next_phase")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </TooltipProvider>
+              </div>
             </div>
           </div>
         )}
@@ -761,6 +918,31 @@ export default function IdeationSession({
           </div>
         </div>
       )}
+
+      {/* Dialog for unsubmitted idea reminder */}
+      <Dialog
+        open={showSubmitReminderDialog}
+        onOpenChange={setShowSubmitReminderDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("time_up_title")}</DialogTitle>
+            <DialogDescription>{t("unsaved_idea_prompt")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:flex-row">
+            <Button
+              variant="outline"
+              onClick={handleSkipRemainingIdea}
+              className="sm:flex-1"
+            >
+              {t("discard_and_continue")}
+            </Button>
+            <Button onClick={handleSubmitRemainingIdea} className="sm:flex-1">
+              {t("submit_and_continue")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

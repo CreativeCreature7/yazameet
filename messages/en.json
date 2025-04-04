@@ -204,7 +204,7 @@
       "rank_ideas": "Rank Ideas",
       "no_ideas_to_rank": "No ideas to rank.",
       "final_selection": "Final Selection",
-      "final_selection_description": "Select your top 3 ideas from the sorted list, then choose the final winner.",
+      "final_selection_description": "Select the most promising idea from the sorted list.",
       "top_ideas": "Top Ideas",
       "selected": "Selected",
       "selected_count": "selected",
@@ -220,9 +220,21 @@
       "session_not_found": "Ideation session not found",
       "back_to_history": "Back to History",
       "go_to_next_phase": "Go to Next Phase",
+      "skip_to_next_phase": "Skip to Next Phase",
+      "go_to_previous_phase": "Go Back",
+      "returned_to_previous_phase": "Returned to previous phase",
       "must_select_winner": "You must select a winner before completing",
       "ai_suggestions": "AI Suggestions",
-      "based_on_session": "Based on Session"
+      "selection_phase": "Selection Phase",
+      "completed_phase": "Completed",
+      "based_on_session": "Based on ideation session",
+      "skipped_to_next_phase": "Skipped to next phase",
+      "time_up_title": "Time's Up!",
+      "unsaved_idea_prompt": "You have an unsubmitted idea. Would you like to add it before moving to the next phase?",
+      "submit_and_continue": "Submit & Continue",
+      "discard_and_continue": "Discard & Continue",
+      "idea_added_success": "Idea added successfully!",
+      "idea_add_error": "Could not add idea. Please try again."
     }
   }
 }

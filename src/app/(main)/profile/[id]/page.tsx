@@ -85,8 +85,11 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             className="flex flex-col items-center sm:items-start"
           >
             <div className="flex flex-wrap gap-1.5">
-              {profile.roles.map((role) => (
-                <Badge className="bg-secondary text-sm text-secondary-foreground">
+              {profile.roles.map((role, index) => (
+                <Badge
+                  className="bg-secondary text-sm text-secondary-foreground"
+                  key={index}
+                >
                   {t(role)}
                 </Badge>
               ))}
