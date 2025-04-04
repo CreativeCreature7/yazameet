@@ -152,7 +152,7 @@
   "cancel": "Cancel",
   "delete": "Delete",
   "ideas": {
-    "banner": "New! come up with your startup ideas",
+    "banner": "New! come up with your startup ideas with the help of AI",
     "click_here": "Click here to get started",
     "title": "Ideas",
     "description": "Start an ideation session solo or with your team to generate and prioritize ideas.",
@@ -182,7 +182,10 @@
       "winning_idea": "Winning Idea:",
       "view_details": "View Details",
       "export_results": "Export Results",
-      "start_new_session": "Start New Ideation Session"
+      "start_new_session": "Start New Ideation Session",
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "sorting_ideas": "Sorting Ideas"
     },
     "session": {
       "team_session": "Team Session",
@@ -216,10 +219,10 @@
       "winner_selected": "Winner selected successfully!",
       "session_not_found": "Ideation session not found",
       "back_to_history": "Back to History",
-      "skip_to_next_phase": "Skip to Next Phase",
-      "skipped_to_next_phase": "Skipped to next phase",
+      "go_to_next_phase": "Go to Next Phase",
       "must_select_winner": "You must select a winner before completing",
-      "ai_suggestions": "AI Suggestions"
+      "ai_suggestions": "AI Suggestions",
+      "based_on_session": "Based on Session"
     }
   }
 }

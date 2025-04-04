@@ -20,13 +20,13 @@ export default function IdeationHistory() {
   const getSessionStatusBadge = (phase: string) => {
     switch (phase) {
       case "COMPLETED":
-        return <Badge className="bg-green-500">Completed</Badge>;
+        return <Badge className="bg-green-500">{t("completed")}</Badge>;
       case "SELECTION":
-        return <Badge className="bg-yellow-500">Final Selection</Badge>;
+        return <Badge className="bg-yellow-500">{t("final_selection")}</Badge>;
       case "SORTING":
-        return <Badge className="bg-blue-500">Sorting Ideas</Badge>;
+        return <Badge className="bg-blue-500">{t("sorting_ideas")}</Badge>;
       case "IDEATION":
-        return <Badge>In Progress</Badge>;
+        return <Badge>{t("in_progress")}</Badge>;
       default:
         return null;
     }
@@ -112,11 +112,6 @@ export default function IdeationHistory() {
                     {t("view_details")}
                   </Link>
                 </Button>
-                {session.phase === "COMPLETED" && (
-                  <Button variant="ghost" size="sm">
-                    {t("export_results")}
-                  </Button>
-                )}
               </div>
             </Card>
           ))}

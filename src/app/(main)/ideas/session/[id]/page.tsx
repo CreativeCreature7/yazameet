@@ -467,6 +467,22 @@ export default function IdeationSession({
     generateAiSuggestions,
   ]);
 
+  // Add function to handle creating a new project
+  const handleCreateProject = () => {
+    if (!session?.winningIdea) return;
+
+    // Encode the winning idea and session name for URL parameters
+    const projectName = encodeURIComponent(session.winningIdea);
+    const description = encodeURIComponent(
+      `${t("based_on_session")}: ${session.name}`,
+    );
+
+    // Navigate to projects page with query parameters
+    router.push(
+      `/projects?createProject=true&name=${projectName}&description=${description}`,
+    );
+  };
+
   // Show loading state
   if (isLoading) {
     return (
@@ -528,12 +544,11 @@ export default function IdeationSession({
                   : t("sorting_phase")}
               </Badge>
               <Button
-                variant="outline"
                 size="sm"
                 onClick={skipToNextPhase}
                 className="mt-2"
               >
-                {t("skip_to_next_phase")}
+                {t("go_to_next_phase")}
               </Button>
             </div>
           </div>
@@ -738,11 +753,10 @@ export default function IdeationSession({
               <p className="text-xl">{session.winningIdea}</p>
             </Card>
 
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1">
-                {t("download_results")}
+            <div className="flex">
+              <Button className="flex-1" onClick={handleCreateProject}>
+                {t("create_project")}
               </Button>
-              <Button className="flex-1">{t("create_project")}</Button>
             </div>
           </div>
         </div>

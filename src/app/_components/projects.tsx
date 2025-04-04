@@ -14,7 +14,15 @@ import { FilterDialog } from "@/app/_components/filter-dialog";
 import { useSession } from "next-auth/react";
 import { ProjectForm } from "@/app/_components/project-form";
 
-const Projects = () => {
+const Projects = ({
+  createProject,
+  name,
+  description,
+}: {
+  createProject?: boolean;
+  name?: string;
+  description?: string;
+}) => {
   const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<Option[]>([]);
@@ -41,7 +49,11 @@ const Projects = () => {
     <div className="mx-auto flex w-full flex-col gap-4 md:container">
       <div className="mx-auto flex w-full flex-row gap-4">
         <div className="inline-block">
-          <ProjectForm />
+          <ProjectForm
+            isCreateProject={createProject}
+            name={name}
+            description={description}
+          />
         </div>
         <div className="relative inline-block w-full">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground rtl:right-3" />

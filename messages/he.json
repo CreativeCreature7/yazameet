@@ -152,7 +152,7 @@
   "cancel": "ביטול",
   "delete": "מחק",
   "ideas": {
-    "banner": "חדש! העלו רעיונות לסטאראטפ שלכם",
+    "banner": "חדש! הגיע הזמן להעלות רעיונות למיזם שלך בעזרת בינה מלאכותית",
     "click_here": "לחצו כאן כדי להתחיל",
     "title": "רעיונות",
     "description": "התחל/י סשן רעיונות לבד או עם הצוות שלך כדי לייצר ולתעדף רעיונות.",
@@ -182,7 +182,10 @@
       "winning_idea": "רעיון מנצח:",
       "view_details": "צפה בפרטים",
       "export_results": "ייצוא תוצאות",
-      "start_new_session": "התחל/י סשן רעיונות חדש"
+      "start_new_session": "התחל/י סשן רעיונות חדש",
+      "completed": "הושלם",
+      "in_progress": "בתהליך",
+      "sorting_ideas": "מיון רעיונות"
     },
     "session": {
       "team_session": "סשן צוותי",
@@ -216,10 +219,10 @@
       "winner_selected": "הרעיון המנצח נבחר בהצלחה!",
       "session_not_found": "סשן הרעיונות לא נמצא",
       "back_to_history": "חזרה להיסטוריה",
-      "skip_to_next_phase": "דלג/י לשלב הבא",
-      "skipped_to_next_phase": "דילגת לשלב הבא",
+      "go_to_next_phase": "עבור לשלב הבא",
       "must_select_winner": "עליך לבחור מנצח לפני השלמת הסשן",
-      "ai_suggestions": "הצעות בינה מלאכותית"
+      "ai_suggestions": "הצעות בינה מלאכותית",
+      "based_on_session": "על פי סשן"
     }
   }
 }

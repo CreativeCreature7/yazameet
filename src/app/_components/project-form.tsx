@@ -53,18 +53,28 @@ type props = {
   values?: z.infer<ReturnType<typeof BaseSchema>>;
   id?: number;
   defaultType?: ProjectType;
+  isCreateProject?: boolean;
+  name?: string;
+  description?: string;
 };
 
-export function ProjectForm({ values, id, defaultType }: props) {
+export function ProjectForm({
+  values,
+  id,
+  defaultType,
+  isCreateProject,
+  name,
+  description,
+}: props) {
   const t = useTranslations();
   const session = useSession();
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(isCreateProject ?? false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const formSchema = BaseSchema(t);
   const defaultValues = {
-    name: "",
-    description: "",
+    name: name ?? "",
+    description: description ?? "",
     rolesNeeded: [],
     type: defaultType ? [{ label: t(defaultType), value: defaultType }] : [],
   };
