@@ -102,12 +102,20 @@ const SortableIdeaItem = ({ idea, index }: { idea: Idea; index: number }) => {
     <Card
       ref={setNodeRef}
       style={style}
-      className={`ursor-move border-solid p-4 transition-all duration-200 ${isDragging ? "scale-[1.02] shadow-lg ring-2 ring-primary" : "hover:bg-accent hover:shadow-sm"}`}
+      className={`cursor-move select-none border-solid p-4 transition-all duration-200 ${
+        isDragging
+          ? "scale-[1.02] shadow-lg ring-2 ring-primary"
+          : "hover:bg-accent hover:shadow-sm"
+      }`}
     >
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center gap-3">
           <Badge
-            className={`min-w-8 border text-center ${isDragging ? "bg-primary text-primary-foreground" : "bg-transparent text-foreground"}`}
+            className={`min-w-8 border text-center ${
+              isDragging
+                ? "bg-primary text-primary-foreground"
+                : "bg-transparent text-foreground"
+            }`}
           >
             {index + 1}
           </Badge>
@@ -771,14 +779,10 @@ export default function IdeationSession({
                         key={index}
                         variant="outline"
                         size="sm"
-                        className="max-w-[80%] justify-start rounded-full border-primary/20 bg-primary/5 px-4 py-2 text-sm hover:bg-primary/10"
+                        className="h-auto w-full max-w-full justify-start whitespace-normal break-words rounded-md border-primary/20 bg-primary/5 px-4 py-2 text-left text-sm hover:bg-primary/10 sm:max-w-[80%]"
                         onClick={() => addAiSuggestionAsIdea(suggestion)}
                       >
-                        <span className="truncate">
-                          {suggestion.length > 200
-                            ? `${suggestion.substring(0, 200)}...`
-                            : suggestion}
-                        </span>
+                        <span className="inline-block">{suggestion}</span>
                       </Button>
                     ))}
                   </div>
