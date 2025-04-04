@@ -234,7 +234,8 @@
       "submit_and_continue": "Submit & Continue",
       "discard_and_continue": "Discard & Continue",
       "idea_added_success": "Idea added successfully!",
-      "idea_add_error": "Could not add idea. Please try again."
+      "idea_add_error": "Could not add idea. Please try again.",
+      "drag_to_reorder": "Tap and hold an item to drag and reorder"
     }
   }
 }

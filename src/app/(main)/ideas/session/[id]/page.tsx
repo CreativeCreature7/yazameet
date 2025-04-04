@@ -54,6 +54,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { LoadingButton } from "@/components/ui/loading-button";
 
 // Phase duration in seconds
 const IDEATION_PHASE_DURATION = 10 * 60; // 10 minutes
@@ -96,17 +97,20 @@ const SortableIdeaItem = ({ idea, index }: { idea: Idea; index: number }) => {
     transition,
     zIndex: isDragging ? 10 : 1,
     opacity: isDragging ? 0.8 : 1,
+    touchAction: "none", // Prevent browser touch actions like scrolling
   };
 
   return (
     <Card
       ref={setNodeRef}
       style={style}
-      className={`cursor-move select-none border-solid p-4 transition-all duration-200 ${
+      className={`cursor-move select-none border-solid p-4 transition-all duration-200 active:scale-[1.01] ${
         isDragging
           ? "scale-[1.02] shadow-lg ring-2 ring-primary"
           : "hover:bg-accent hover:shadow-sm"
       }`}
+      {...attributes}
+      {...listeners}
     >
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center gap-3">
@@ -121,11 +125,7 @@ const SortableIdeaItem = ({ idea, index }: { idea: Idea; index: number }) => {
           </Badge>
           <p className="flex-1">{idea.text}</p>
         </div>
-        <div
-          className="cursor-grab text-muted-foreground hover:text-foreground"
-          {...attributes}
-          {...listeners}
-        >
+        <div className="text-muted-foreground">
           <GripVertical size={20} />
         </div>
       </div>
@@ -148,17 +148,18 @@ export default function IdeationSession({
   const [isLoadingAiSuggestions, setIsLoadingAiSuggestions] = useState(false);
   const [showSubmitReminderDialog, setShowSubmitReminderDialog] =
     useState(false);
+  const [isSubmittingIdea, setIsSubmittingIdea] = useState(false);
 
   // Setup sensors for drag and drop
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        // Require a more deliberate drag to start (helps on mobile)
-        distance: 8,
-        // Add a delay to distinguish between scrolling and dragging on touch devices
-        delay: 100,
-        // Add tolerance for slight vertical movement on mobile
-        tolerance: 5,
+        // Make drag activation easier on mobile
+        distance: 5, // Reduced from 8
+        // Remove delay that might be causing issues on mobile
+        delay: 0,
+        // Increase tolerance for touch inaccuracy
+        tolerance: 10,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -195,9 +196,11 @@ export default function IdeationSession({
     onSuccess: () => {
       form.reset({ text: "" });
       void refetch();
+      setIsSubmittingIdea(false);
     },
     onError: (error) => {
       toast.error(error.message);
+      setIsSubmittingIdea(false);
     },
   });
 
@@ -369,6 +372,7 @@ export default function IdeationSession({
   function onSubmitNewIdea(values: z.infer<typeof newIdeaSchema>) {
     if (!session) return;
 
+    setIsSubmittingIdea(true);
     addIdea({
       text: values.text,
       sessionId: session.id,
@@ -387,11 +391,13 @@ export default function IdeationSession({
   // Handle drag start for sorting
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+    setIsDragging(true); // Add this to track dragging state
   };
 
   // Handle drag end for sorting
   const handleDragEnd = (event: DragEndEvent) => {
     setActiveId(null);
+    setIsDragging(false); // Reset dragging state
 
     const { active, over } = event;
 
@@ -750,9 +756,13 @@ export default function IdeationSession({
                     </FormItem>
                   )}
                 />
-                <Button className="block" type="submit">
+                <LoadingButton
+                  className="block"
+                  type="submit"
+                  loading={isSubmittingIdea}
+                >
                   {t("add_idea")}
-                </Button>
+                </LoadingButton>
               </form>
             </Form>
 
@@ -779,7 +789,7 @@ export default function IdeationSession({
                         key={index}
                         variant="outline"
                         size="sm"
-                        className="h-auto w-full max-w-full justify-start whitespace-normal break-words rounded-md border-primary/20 bg-primary/5 px-4 py-2 text-left text-sm hover:bg-primary/10 sm:max-w-[80%]"
+                        className="h-auto w-full max-w-full justify-start whitespace-normal break-words rounded-md border-primary/20 bg-primary/5 px-4 py-2 text-start text-sm hover:bg-primary/10 sm:max-w-[80%]"
                         onClick={() => addAiSuggestionAsIdea(suggestion)}
                       >
                         <span className="inline-block">{suggestion}</span>
@@ -818,6 +828,9 @@ export default function IdeationSession({
               {t("prioritize_ideas")}
             </h2>
             <p className="mb-4">{t("prioritize_ideas_description")}</p>
+            <p className="mb-2 text-sm text-muted-foreground">
+              {t("drag_to_reorder")}
+            </p>
           </Card>
 
           <div className="space-y-4">
@@ -832,6 +845,8 @@ export default function IdeationSession({
                 collisionDetection={closestCenter}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
+                modifiers={[]} // Remove any restrictive modifiers
+                autoScroll={true} // Enable auto-scrolling for long lists
               >
                 <SortableContext
                   items={localIdeas.map((idea) => idea.id)}
@@ -849,7 +864,23 @@ export default function IdeationSession({
                 </SortableContext>
 
                 <DragOverlay adjustScale={true} className="cursor-grabbing">
-                  {activeId ? <></> : null}
+                  {activeId ? (
+                    <Card className="select-none rounded-md border-2 border-primary bg-background p-4 shadow-lg">
+                      <div className="flex items-center gap-3">
+                        <Badge className="min-w-8 border bg-primary text-primary-foreground">
+                          {localIdeas.findIndex(
+                            (item) => item.id === activeId,
+                          ) + 1}
+                        </Badge>
+                        <p>
+                          {
+                            localIdeas.find((item) => item.id === activeId)
+                              ?.text
+                          }
+                        </p>
+                      </div>
+                    </Card>
+                  ) : null}
                 </DragOverlay>
               </DndContext>
             )}
