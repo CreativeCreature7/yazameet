@@ -58,7 +58,7 @@ import { LoadingButton } from "@/components/ui/loading-button";
 
 // Phase duration in seconds
 const IDEATION_PHASE_DURATION = 10 * 60; // 10 minutes
-const SORTING_PHASE_DURATION = 3 * 60; // 3 minutes
+const SORTING_PHASE_DURATION = 5 * 60; // 5 minutes
 
 // Define the Idea interface to match the session.ideas structure
 type Idea = {
@@ -756,11 +756,7 @@ export default function IdeationSession({
                     </FormItem>
                   )}
                 />
-                <LoadingButton
-                  className="block"
-                  type="submit"
-                  loading={isSubmittingIdea}
-                >
+                <LoadingButton type="submit" loading={isSubmittingIdea}>
                   {t("add_idea")}
                 </LoadingButton>
               </form>
