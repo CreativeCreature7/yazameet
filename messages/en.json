@@ -152,7 +152,7 @@
   "cancel": "Cancel",
   "delete": "Delete",
   "ideas": {
-    "banner": "New! come up with your startup ideas and collaborate with others",
+    "banner": "New! come up with your startup ideas",
     "click_here": "Click here to get started",
     "title": "Ideas",
     "description": "Start an ideation session solo or with your team to generate and prioritize ideas.",
@@ -168,7 +168,8 @@
       "team_members_placeholder": "teammate1@example.com, teammate2@example.com",
       "team_members_help": "Team members will receive an invitation to join this session.",
       "start_session": "Start Session",
-      "session_created": "Session created successfully"
+      "session_created": "Session created successfully",
+      "coming_soon": "(Coming Soon)"
     },
     "history": {
       "title": "Past Ideation Sessions",
@@ -214,7 +215,11 @@
       "create_project": "Create Project From Idea",
       "winner_selected": "Winner selected successfully!",
       "session_not_found": "Ideation session not found",
-      "back_to_history": "Back to History"
+      "back_to_history": "Back to History",
+      "skip_to_next_phase": "Skip to Next Phase",
+      "skipped_to_next_phase": "Skipped to next phase",
+      "must_select_winner": "You must select a winner before completing",
+      "ai_suggestions": "AI Suggestions"
     }
   }
 }

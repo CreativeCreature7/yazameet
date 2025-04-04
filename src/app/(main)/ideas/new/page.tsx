@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useTranslations } from "next-intl";
 import { api } from "@/trpc/react";
@@ -22,6 +22,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import Image from "next/image";
+import Ideation2 from "@/../public/Images/ideation_2.svg";
 
 export default function NewIdeationSession() {
   const router = useRouter();
@@ -78,9 +80,7 @@ export default function NewIdeationSession() {
   }
 
   return (
-    <div className="container max-w-md py-8">
-      <h1 className="mb-6 text-2xl font-bold">{t("title")}</h1>
-
+    <div className="container flex max-w-lg flex-1 flex-col items-center justify-center py-8">
       {apiError && (
         <Card className="mb-4 border-red-300 bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-300">
           <h3 className="mb-2 text-sm font-medium">Error</h3>
@@ -97,6 +97,7 @@ export default function NewIdeationSession() {
       )}
 
       <Card className="p-6">
+        <h1 className="mb-6 text-2xl font-bold">{t("title")}</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -125,9 +126,12 @@ export default function NewIdeationSession() {
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
+                      disabled
                     />
                   </FormControl>
-                  <FormLabel className="mt-0">{t("team_session")}</FormLabel>
+                  <FormLabel className="!m-0">
+                    {t("team_session")} {t("coming_soon")}
+                  </FormLabel>
                 </FormItem>
               )}
             />
@@ -158,6 +162,9 @@ export default function NewIdeationSession() {
             </div>
           </form>
         </Form>
+        <div className="mt-6">
+          <Image src={Ideation2} alt="Ideation Logo" height={300} />
+        </div>
       </Card>
     </div>
   );

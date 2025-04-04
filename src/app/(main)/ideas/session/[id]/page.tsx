@@ -15,15 +15,96 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, Sparkles } from "lucide-react";
 
 // Phase duration in seconds
-const IDEATION_PHASE_DURATION = 1 * 20; // 20 seconds
-const SORTING_PHASE_DURATION = 1 * 20; // 20 seconds
+const IDEATION_PHASE_DURATION = 10 * 60; // 10 minutes
+const SORTING_PHASE_DURATION = 3 * 60; // 3 minutes
+
+// Define the Idea interface to match the session.ideas structure
+type Idea = {
+  id: string;
+  text: string;
+  rank: number | null;
+  isWinner: boolean;
+  createdAt: Date;
+  sessionId: string;
+  userId: string;
+  user: {
+    name: string | null;
+    id: string;
+    image: string | null;
+  };
+};
 
 // Schema for adding a new idea
 const newIdeaSchema = z.object({
   text: z.string().min(1, "Idea text is required"),
 });
+
+// Sortable Item Component
+const SortableIdeaItem = ({ idea, index }: { idea: Idea; index: number }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: idea.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1,
+    opacity: isDragging ? 0.8 : 1,
+  };
+
+  return (
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={`ursor-move border-solid p-4 transition-all duration-200 ${isDragging ? "scale-[1.02] shadow-lg ring-2 ring-primary" : "hover:bg-accent hover:shadow-sm"}`}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex flex-1 items-center gap-3">
+          <Badge
+            className={`min-w-8 border text-center ${isDragging ? "bg-primary text-primary-foreground" : "bg-transparent text-foreground"}`}
+          >
+            {index + 1}
+          </Badge>
+          <p className="flex-1">{idea.text}</p>
+        </div>
+        <div
+          className="cursor-grab text-muted-foreground hover:text-foreground"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical size={20} />
+        </div>
+      </div>
+    </Card>
+  );
+};
 
 export default function IdeationSession({
   params,
@@ -33,24 +114,52 @@ export default function IdeationSession({
   const router = useRouter();
   const t = useTranslations("ideas.session");
   const [timeRemaining, setTimeRemaining] = useState(IDEATION_PHASE_DURATION);
-  const [selectedIdeas, setSelectedIdeas] = useState<string[]>([]);
+  const [localIdeas, setLocalIdeas] = useState<Idea[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  const [isLoadingAiSuggestions, setIsLoadingAiSuggestions] = useState(false);
+
+  // Setup sensors for drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        // Require a more deliberate drag to start (helps on mobile)
+        distance: 8,
+        // Add a delay to distinguish between scrolling and dragging on touch devices
+        delay: 100,
+        // Add tolerance for slight vertical movement on mobile
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   // Fetch session data
   const {
     data: session,
     isLoading,
     refetch,
-  } = api.ideation.getById.useQuery(
-    {
-      id: params.id,
-    },
-    {
-      onError: (error) => {
-        toast.error(error.message);
-        router.push("/ideas/history");
-      },
-    },
-  );
+  } = api.ideation.getById.useQuery({
+    id: params.id,
+  });
+
+  // Update local ideas when session changes
+  useEffect(() => {
+    if (session?.ideas) {
+      setLocalIdeas(session.ideas);
+    }
+  }, [session]);
+
+  // Handle error for session fetch
+  useEffect(() => {
+    if (!session && !isLoading) {
+      toast.error("Session not found");
+      router.push("/ideas/history");
+    }
+  }, [session, isLoading, router]);
 
   // Setup mutations
   const { mutate: addIdea } = api.ideation.addIdea.useMutation({
@@ -158,53 +267,49 @@ export default function IdeationSession({
     });
   }
 
-  // Handle idea sorting
-  const handleIdeaRank = (ideaId: string, direction: "up" | "down") => {
-    if (!session || !session.ideas) return;
-
-    // Create a copy of the ideas array
-    const ideasCopy = [...session.ideas];
-    const ideaIndex = ideasCopy.findIndex((idea) => idea.id === ideaId);
-
-    if (ideaIndex === -1) return;
-
-    const swapIndex =
-      direction === "up"
-        ? Math.max(0, ideaIndex - 1)
-        : Math.min(ideasCopy.length - 1, ideaIndex + 1);
-
-    if (swapIndex === ideaIndex) return;
-
-    // Swap items
-    [ideasCopy[ideaIndex], ideasCopy[swapIndex]] = [
-      ideasCopy[swapIndex],
-      ideasCopy[ideaIndex],
-    ];
-
-    // Update ranks
-    const updatedIdeas = ideasCopy.map((idea, index) => ({
-      id: idea.id,
-      rank: index,
-    }));
-
-    // Optimistically update the UI (handled by refetch in the success callback)
-    updateIdeaRanks({
-      sessionId: session.id,
-      ideas: updatedIdeas,
-    });
+  // Handle Enter key press to submit
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Submit on Enter, but allow Shift+Enter for new lines
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      void form.handleSubmit(onSubmitNewIdea)();
+    }
   };
 
-  // Toggle idea selection for final phase
-  const toggleIdeaSelection = (ideaId: string) => {
-    setSelectedIdeas((prev) => {
-      if (prev.includes(ideaId)) {
-        return prev.filter((id) => id !== ideaId);
-      } else {
-        if (prev.length < 3) {
-          return [...prev, ideaId];
-        }
-        return prev;
+  // Handle drag start for sorting
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  // Handle drag end for sorting
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null);
+
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    setLocalIdeas((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+
+      // Update local state immediately for better UX
+      const newItems = arrayMove(items, oldIndex, newIndex);
+
+      // Send update to server
+      if (session) {
+        const updatedIdeas = newItems.map((idea, index) => ({
+          id: idea.id,
+          rank: index,
+        }));
+
+        updateIdeaRanks({
+          sessionId: session.id,
+          ideas: updatedIdeas,
+        });
       }
+
+      return newItems;
     });
   };
 
@@ -217,6 +322,150 @@ export default function IdeationSession({
       ideaId,
     });
   };
+
+  // Skip to next phase
+  const skipToNextPhase = () => {
+    if (!session) return;
+
+    let nextPhase;
+
+    if (session.phase === IdeationPhase.IDEATION) {
+      nextPhase = IdeationPhase.SORTING;
+    } else if (session.phase === IdeationPhase.SORTING) {
+      nextPhase = IdeationPhase.SELECTION;
+    } else if (session.phase === IdeationPhase.SELECTION) {
+      // Cannot skip from SELECTION to COMPLETED without choosing a winner
+      toast.error(t("must_select_winner"));
+      return;
+    } else {
+      return; // Already completed
+    }
+
+    updatePhase({
+      sessionId: session.id,
+      phase: nextPhase,
+    });
+
+    toast.success(t("skipped_to_next_phase"));
+  };
+
+  // Generate AI suggestions
+  const generateAiSuggestions = useCallback(async () => {
+    if (!session || session.ideas.length < 3) return;
+
+    try {
+      setIsLoadingAiSuggestions(true);
+
+      // Extract the existing idea texts for sending to API
+      const ideaTexts = session.ideas.map((idea) => idea.text);
+
+      // Call our API endpoint
+      const response = await fetch("/api/ai-suggestions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sessionName: session.name,
+          ideas: ideaTexts,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch AI suggestions");
+      }
+
+      const data = await response.json();
+      setAiSuggestions(data.suggestions);
+    } catch (error) {
+      console.error("Failed to generate AI suggestions:", error);
+      toast.error("Failed to generate AI suggestions");
+    } finally {
+      setIsLoadingAiSuggestions(false);
+    }
+  }, [session]);
+
+  // Add AI suggestion as an idea
+  const addAiSuggestionAsIdea = useCallback(
+    (suggestion: string) => {
+      if (!session) return;
+
+      addIdea({
+        text: suggestion,
+        sessionId: session.id,
+      });
+
+      // Immediately request a single new suggestion to replace the used one
+      const fetchNewSuggestion = async () => {
+        try {
+          // Extract the existing idea texts for sending to API
+          const ideaTexts = [
+            ...session.ideas.map((idea) => idea.text),
+            suggestion,
+          ];
+
+          // Call our API endpoint with a specific flag to get just one suggestion
+          const response = await fetch("/api/ai-suggestions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sessionName: session.name,
+              ideas: ideaTexts,
+              requestSingleSuggestion: true,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch new AI suggestion");
+          }
+
+          const data = await response.json();
+
+          // Replace the used suggestion with the new one
+          setAiSuggestions((prev) => {
+            const newSuggestions = [...prev];
+            const index = newSuggestions.indexOf(suggestion);
+            if (index !== -1 && data.suggestions.length > 0) {
+              // Replace the used suggestion with a new one
+              newSuggestions[index] = data.suggestions[0];
+            } else if (index !== -1) {
+              // If no new suggestion returned, remove the used one
+              newSuggestions.splice(index, 1);
+            }
+            return newSuggestions;
+          });
+        } catch (error) {
+          console.error("Failed to generate new AI suggestion:", error);
+          // Still remove the used suggestion even if we fail to get a new one
+          setAiSuggestions((prev) => prev.filter((s) => s !== suggestion));
+        }
+      };
+
+      // Start fetching a new suggestion
+      void fetchNewSuggestion();
+    },
+    [session, addIdea],
+  );
+
+  // Check if we should show AI suggestions (when there are at least 3 user ideas)
+  useEffect(() => {
+    if (
+      session?.phase === IdeationPhase.IDEATION &&
+      session.ideas.length >= 3 &&
+      aiSuggestions.length === 0 &&
+      !isLoadingAiSuggestions
+    ) {
+      void generateAiSuggestions();
+    }
+  }, [
+    session?.phase,
+    session?.ideas.length,
+    aiSuggestions.length,
+    isLoadingAiSuggestions,
+    generateAiSuggestions,
+  ]);
 
   // Show loading state
   if (isLoading) {
@@ -259,11 +508,11 @@ export default function IdeationSession({
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{session.name}</h1>
-          <p className="text-muted-foreground">
+          {/* <p className="text-muted-foreground">
             {session.isTeam ? t("team_session") : t("solo_session")}
             {" • "}
             {t("session_id")} {session.id}
-          </p>
+          </p> */}
         </div>
 
         {(session.phase === IdeationPhase.IDEATION ||
@@ -272,11 +521,21 @@ export default function IdeationSession({
             <div className="mb-1 font-mono text-3xl">
               {formatTime(timeRemaining)}
             </div>
-            <Badge className="border bg-transparent text-foreground">
-              {session.phase === IdeationPhase.IDEATION
-                ? t("ideation_phase")
-                : t("sorting_phase")}
-            </Badge>
+            <div className="flex flex-col gap-2">
+              <Badge className="border bg-transparent text-foreground">
+                {session.phase === IdeationPhase.IDEATION
+                  ? t("ideation_phase")
+                  : t("sorting_phase")}
+              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={skipToNextPhase}
+                className="mt-2"
+              >
+                {t("skip_to_next_phase")}
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -293,7 +552,7 @@ export default function IdeationSession({
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmitNewIdea)}
-                className="flex gap-2"
+                className="flex flex-col gap-2"
               >
                 <FormField
                   control={form.control}
@@ -305,14 +564,55 @@ export default function IdeationSession({
                           placeholder={t("idea_placeholder")}
                           className="flex-1"
                           {...field}
+                          onKeyDown={handleKeyDown}
                         />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-                <Button type="submit">{t("add_idea")}</Button>
+                <Button className="block" type="submit">
+                  {t("add_idea")}
+                </Button>
               </form>
             </Form>
+
+            {/* AI Suggestions as Chips */}
+            {session.ideas.length >= 3 && (
+              <div className="mt-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">
+                    {t("ai_suggestions")}
+                  </span>
+                </div>
+
+                {isLoadingAiSuggestions ? (
+                  <div className="flex flex-wrap gap-2">
+                    <Skeleton className="h-8 w-44 rounded-full" />
+                    <Skeleton className="h-8 w-52 rounded-full" />
+                    <Skeleton className="h-8 w-48 rounded-full" />
+                  </div>
+                ) : aiSuggestions.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {aiSuggestions.map((suggestion, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="sm"
+                        className="max-w-[80%] justify-start rounded-full border-primary/20 bg-primary/5 px-4 py-2 text-sm hover:bg-primary/10"
+                        onClick={() => addAiSuggestionAsIdea(suggestion)}
+                      >
+                        <span className="truncate">
+                          {suggestion.length > 200
+                            ? `${suggestion.substring(0, 200)}...`
+                            : suggestion}
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            )}
           </Card>
 
           <div className="space-y-4">
@@ -346,44 +646,36 @@ export default function IdeationSession({
 
           <div className="space-y-4">
             <h3 className="text-lg font-medium">
-              {t("rank_ideas")} ({session.ideas.length})
+              {t("rank_ideas")} ({localIdeas.length})
             </h3>
-            {session.ideas.length === 0 ? (
+            {localIdeas.length === 0 ? (
               <p className="text-muted-foreground">{t("no_ideas_to_rank")}</p>
             ) : (
-              <div className="space-y-2">
-                {session.ideas.map((idea, index) => (
-                  <Card
-                    key={idea.id}
-                    className="flex items-center justify-between p-4"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Badge className="border bg-transparent text-foreground">
-                        {index + 1}
-                      </Badge>
-                      <p>{idea.text}</p>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleIdeaRank(idea.id, "up")}
-                        disabled={index === 0}
-                      >
-                        ↑
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleIdeaRank(idea.id, "down")}
-                        disabled={index === session.ideas.length - 1}
-                      >
-                        ↓
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={localIdeas.map((idea) => idea.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-2">
+                    {localIdeas.map((idea, index) => (
+                      <SortableIdeaItem
+                        key={idea.id}
+                        idea={idea}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+
+                <DragOverlay adjustScale={true} className="cursor-grabbing">
+                  {activeId ? <></> : null}
+                </DragOverlay>
+              </DndContext>
             )}
           </div>
         </div>
@@ -400,69 +692,33 @@ export default function IdeationSession({
           </Card>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">{t("top_ideas")}</h3>
-              <Badge className="border bg-transparent text-foreground">
-                {selectedIdeas.length}/3 {t("selected_count")}
-              </Badge>
-            </div>
+            <h3 className="text-lg font-medium">{t("top_ideas")}</h3>
 
             {session.ideas.length === 0 ? (
               <p className="text-muted-foreground">{t("no_ideas_to_select")}</p>
             ) : (
               <div className="space-y-3">
                 {session.ideas.slice(0, 10).map((idea, index) => (
-                  <Card
-                    key={idea.id}
-                    className={`cursor-pointer p-4 ${
-                      selectedIdeas.includes(idea.id) ? "border-primary" : ""
-                    }`}
-                    onClick={() =>
-                      selectedIdeas.length < 3 ||
-                      selectedIdeas.includes(idea.id)
-                        ? toggleIdeaSelection(idea.id)
-                        : null
-                    }
-                  >
-                    <div className="flex items-center gap-3">
-                      <Badge className="border bg-transparent text-foreground">
-                        {index + 1}
-                      </Badge>
-                      <p>{idea.text}</p>
-                      {selectedIdeas.includes(idea.id) && (
-                        <Badge className="bg-primary text-primary-foreground">
-                          {t("selected")}
+                  <Card key={idea.id} className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Badge className="border bg-transparent text-foreground">
+                          {index + 1}
                         </Badge>
-                      )}
+                        <p>{idea.text}</p>
+                      </div>
+                      <Button
+                        onClick={() => finalizeSelection(idea.id)}
+                        size="sm"
+                      >
+                        {t("select_as_winner")}
+                      </Button>
                     </div>
                   </Card>
                 ))}
               </div>
             )}
           </div>
-
-          {selectedIdeas.length === 3 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">{t("choose_winner")}</h3>
-              <div className="space-y-3">
-                {session.ideas
-                  .filter((idea) => selectedIdeas.includes(idea.id))
-                  .map((idea) => (
-                    <Card key={idea.id} className="p-4">
-                      <div className="flex items-center justify-between">
-                        <p>{idea.text}</p>
-                        <Button
-                          onClick={() => finalizeSelection(idea.id)}
-                          size="sm"
-                        >
-                          {t("select_as_winner")}
-                        </Button>
-                      </div>
-                    </Card>
-                  ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
 

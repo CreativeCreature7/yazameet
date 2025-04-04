@@ -38,8 +38,8 @@ const Projects = () => {
     latestProjectsQuery;
 
   return (
-    <div className="flex w-full flex-col gap-4">
-      <div className="flex w-full flex-row gap-4">
+    <div className="mx-auto flex w-full flex-col gap-4 md:container">
+      <div className="mx-auto flex w-full flex-row gap-4">
         <div className="inline-block">
           <ProjectForm />
         </div>
@@ -59,7 +59,7 @@ const Projects = () => {
           />
         </div>
       </div>
-      <div className="hidden-scrollbar max-h-[calc(100vh_-_14rem)] w-full overflow-y-auto md:max-h-[calc(100vh_-_19rem)]">
+      <div className="hidden-scrollbar max-h-[calc(100vh_-_13rem)] w-full overflow-y-auto">
         <div className="flex w-full flex-col items-center gap-3">
           {latestProjects?.pages.map((group, i) => (
             <React.Fragment key={i}>
