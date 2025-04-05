@@ -65,7 +65,7 @@ export const projectRouter = createTRPCRouter({
               name: Event_NEW_PROJECT,
               data: {
                 roles: input.rolesNeeded,
-                url: `https://yazameet.vercel.app/projects/`,
+                url: `https://www.yazameet.com/projects/`,
               },
             })
             .catch(console.error);
@@ -310,7 +310,7 @@ export const projectRouter = createTRPCRouter({
           projectName: project.name,
           requesterName: contactRequest.user.name!,
           purpose: input.purpose,
-          requestUrl: `https://yazameet.vercel.app/dashboard/requests`,
+          requestUrl: `https://www.yazameet.com/dashboard/requests`,
         }),
       });
 
